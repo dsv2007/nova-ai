@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any, prefer-const, @typescript-eslint/no-unused-vars */
+
 import { useState, useEffect, useRef } from "react";
 import { 
   motion, 
@@ -33,7 +35,12 @@ import {
   Boxes,
   HelpCircle,
   Upload,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Shield,
+  Lock,
+  Wallet,
+  AlertTriangle,
+  Server
 } from "lucide-react";
 import { 
   ResponsiveContainer, 
@@ -49,42 +56,40 @@ import {
   AreaChart, 
   Area 
 } from "recharts";
-import Link from "next/link";
 
 export default function Platform() {
-  const [activeSection, setActiveSection] = useState("Dashboard");
+  const [activeSection, setActiveSection] = useState("Incident Dashboard");
   const menuItems = [
-    { icon: <Boxes className="w-4 h-4" />, label: "Dashboard" },
-    { icon: <Brain className="w-4 h-4" />, label: "ML Playground" },
-    { icon: <Layers className="w-4 h-4" />, label: "Data Pipelines" },
-    { icon: <MessageSquare className="w-4 h-4" />, label: "AI Copilot" },
-    { icon: <TrendingUp className="w-4 h-4" />, label: "Forecasting" },
-    { icon: <Activity className="w-4 h-4" />, label: "API Deployments" },
-    { icon: <SettingsIcon className="w-4 h-4" />, label: "Settings" }
+    { icon: <Boxes className="w-4 h-4" />, label: "Incident Dashboard" },
+    { icon: <Shield className="w-4 h-4" />, label: "Corruption Sandbox" },
+    { icon: <Layers className="w-4 h-4" />, label: "Syslog Ingestion" },
+    { icon: <MessageSquare className="w-4 h-4" />, label: "Incident Response Copilot" },
+    { icon: <TrendingUp className="w-4 h-4" />, label: "Incident Forecasting" },
+    { icon: <Activity className="w-4 h-4" />, label: "Containment Webhooks" },
+    { icon: <SettingsIcon className="w-4 h-4" />, label: "Workspace Settings" }
   ];
 
   // ==========================================
   // STATE MANAGEMENT
   // ==========================================
 
-  // --- PLAYGROUND STATE ---
-  const [selectedDataset, setSelectedDataset] = useState("churn");
-  const [selectedModel, setSelectedModel] = useState("xgboost");
-  const [lr, setLr] = useState(0.05);
-  const [depth, setDepth] = useState(6);
-  const [trees, setTrees] = useState(100);
-  const [epochs, setEpochs] = useState(30);
+  // --- CORRUPTION SANDBOX STATE ---
+  const [selectedDirectory, setSelectedDirectory] = useState("etc");
+  const [selectedEngine, setSelectedEngine] = useState("sha256");
+  const [targetIntegrity, setTargetIntegrity] = useState(99.9);
+  const [scanDepth, setScanDepth] = useState(3);
+  const [bufferSize, setBufferSize] = useState(50);
   
-  const [isTraining, setIsTraining] = useState(false);
-  const [trainingProgress, setTrainingProgress] = useState(0);
-  const [trainingMetrics, setTrainingMetrics] = useState<any[]>([]);
-  const [featureImportance, setFeatureImportance] = useState<any[]>([]);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [simProgress, setSimProgress] = useState(0);
+  const [simMetrics, setSimMetrics] = useState<any[]>([]);
+  const [corruptionDrivers, setCorruptionDrivers] = useState<any[]>([]);
   
   const [predictInputs, setPredictInputs] = useState<any>({});
   const [predictOutput, setPredictOutput] = useState<string | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
 
-  // --- UPLOADED DATASET STATE ---
+  // --- UPLOADED EVENT STATE ---
   interface UploadedColumnStat {
     column: string;
     type: "Numeric" | "Categorical";
@@ -106,7 +111,7 @@ export default function Platform() {
   const [targetColumn, setTargetColumn] = useState<string>("");
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [isParsing, setIsParsing] = useState(false);
-  const [playgroundActiveTab, setPlaygroundActiveTab] = useState<"training" | "features" | "summary">("training");
+  const [playgroundActiveTab, setPlaygroundActiveTab] = useState<"simulation" | "drivers" | "summary">("simulation");
 
   // --- PIPELINES STATE ---
   const [pipelineStep, setPipelineStep] = useState(0);
@@ -118,7 +123,7 @@ export default function Platform() {
   const [chatHistory, setChatHistory] = useState<any[]>([
     {
       sender: "ai",
-      text: "Hello! I am your NovaMind Analytics Copilot. Select a prompt chip below or ask me any question about your data pipelines, ML weights, or optimization runs."
+      text: "Hello! I am your Nova AI Incident Response Copilot. Select a prompt chip below or ask me any question about syslog errors, file corruption events, or how to write server quarantine scripts."
     }
   ]);
   const [chatInput, setChatInput] = useState("");
@@ -126,28 +131,74 @@ export default function Platform() {
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
   // --- FORECASTING STATE ---
-  const [selectedForecastMetric, setSelectedForecastMetric] = useState("mrr");
+  const [selectedForecastMetric, setSelectedForecastMetric] = useState("incidents");
   const [forecastHorizon, setForecastHorizon] = useState(30);
   const [forecastModel, setForecastModel] = useState("prophet");
   const [isForecasting, setIsForecasting] = useState(false);
   const [forecastResult, setForecastResult] = useState<any[]>([]);
 
-  // --- API DEPLOYMENTS STATE ---
-  const [apiTesterEndpoint, setApiTesterEndpoint] = useState("telecom-churn-predictor");
-  const [apiTesterInput, setApiTesterInput] = useState(`{\n  "tenure": 12,\n  "monthly_charges": 65.80,\n  "total_charges": 789.60,\n  "contract_type": "One year"\n}`);
+  // --- WEBHOOKS STATE ---
+  const [apiTesterEndpoint, setApiTesterEndpoint] = useState("server-quarantine-webhook");
+  const [apiTesterInput, setApiTesterInput] = useState(`{\n  "target_node": "Server-East-04",\n  "incident_id": "err_f839a2d",\n  "quarantine_network": "10.0.4.0/24",\n  "containment_level": "critical"\n}`);
   const [apiTesterOutput, setApiTesterOutput] = useState("");
   const [isApiTesting, setIsApiTesting] = useState(false);
 
   // --- SETTINGS STATE ---
-  const [apiKey, setApiKey] = useState("nm_live_9f82d7c041e2a39d88bc71");
+  const [apiKey, setApiKey] = useState("na_live_9f82c301bd49208a0d927a");
   const [generatedKeyMsg, setGeneratedKeyMsg] = useState(false);
   const [rateLimit, setRateLimit] = useState(5000);
+
+  // --- LIVE BACKEND STATE ---
+  const [isLiveBackend, setIsLiveBackend] = useState(false);
+  const [liveStatus, setLiveStatus] = useState<any>(null);
+  const [liveFiles, setLiveFiles] = useState<any[]>([]);
+  const [liveLogs, setLiveLogs] = useState<any[]>([]);
+  const [lastScanResult, setLastScanResult] = useState<any>(null);
+
+  const fetchFiles = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/files");
+      if (res.ok) {
+        const data = await res.json();
+        setLiveFiles(data);
+      }
+    } catch (e) {}
+  };
+
+  const fetchLogs = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/logs");
+      if (res.ok) {
+        const data = await res.json();
+        setLiveLogs(data);
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    const checkBackendStatus = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/status");
+        if (res.ok) {
+          const data = await res.json();
+          setLiveStatus(data);
+          setIsLiveBackend(true);
+          fetchFiles();
+          fetchLogs();
+          setSelectedDirectory("live_sandbox");
+        }
+      } catch (err) {
+        setIsLiveBackend(false);
+      }
+    };
+    checkBackendStatus();
+  }, []);
 
   // ==========================================
   // REUSABLE SIMULATIONS
   // ==========================================
 
-  // --- PLAYGROUND FUNCTIONS ---
+  // --- SIMULATION FUNCTIONS ---
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -245,7 +296,7 @@ export default function Platform() {
         // Set default target & features
         setTargetColumn(headers[headers.length - 1]);
         setSelectedFeatures(headers.slice(0, headers.length - 1));
-        setSelectedDataset("uploaded");
+        setSelectedDirectory("uploaded");
         setPlaygroundActiveTab("summary");
         setPredictOutput(null);
 
@@ -264,85 +315,112 @@ export default function Platform() {
     reader.readAsText(file);
   };
 
-  const handleRunTraining = () => {
-    setIsTraining(true);
-    setTrainingProgress(0);
-    setTrainingMetrics([]);
+  const handleRunSimulation = () => {
+    setIsSimulating(true);
+    setSimProgress(0);
+    setSimMetrics([]);
     setPredictOutput(null);
-    setPlaygroundActiveTab("training");
+    setPlaygroundActiveTab("simulation");
     
-    let currentEpoch = 0;
-    const maxEpochs = selectedModel === "mlp" ? epochs : 10;
+    let currentStep = 0;
+    const maxSteps = selectedEngine === "lstm" ? bufferSize : 15;
     const tempMetrics: any[] = [];
     
     const interval = setInterval(() => {
-      currentEpoch++;
-      const progressPct = Math.round((currentEpoch / maxEpochs) * 100);
-      setTrainingProgress(progressPct);
+      currentStep++;
+      const progressPct = Math.round((currentStep / maxSteps) * 100);
+      setSimProgress(progressPct);
 
-      // Simulate learning curve
-      const trainLoss = Number((0.8 * Math.exp(-currentEpoch / (maxEpochs * 0.4)) + 0.05 + Math.random() * 0.02).toFixed(4));
-      const valLoss = Number((trainLoss + 0.02 + Math.random() * 0.015).toFixed(4));
-      const trainAcc = Number((100 - (trainLoss * 80)).toFixed(1));
-      const valAcc = Number((trainAcc - 1.5 - Math.random() * 1).toFixed(1));
+      // Simulate drift curve
+      const integrity = Number((targetIntegrity * (1 - 0.05 * Math.exp(-currentStep / (maxSteps * 0.4))) + (Math.random() * 0.1 - 0.05)).toFixed(3));
+      const scanLatency = Number(Math.max(2, 45 - currentStep * 1.5 + Math.random() * 3).toFixed(1));
+      const errorRate = Number(Math.max(0.01, 2.5 - currentStep * 0.15 + Math.random() * 0.5).toFixed(3));
 
       tempMetrics.push({
-        epoch: currentEpoch,
-        loss: trainLoss,
-        valLoss: valLoss,
-        accuracy: Math.min(99.9, trainAcc),
-        valAccuracy: Math.min(98.8, valAcc)
+        step: currentStep,
+        integrity: Math.min(100, integrity),
+        latency: scanLatency,
+        errorRate: errorRate
       });
-      setTrainingMetrics([...tempMetrics]);
+      setSimMetrics([...tempMetrics]);
 
-      if (currentEpoch >= maxEpochs) {
+      if (currentStep >= maxSteps) {
         clearInterval(interval);
-        setIsTraining(false);
-        // Set simulated feature importances
-        if (selectedDataset === "churn") {
-          setFeatureImportance([
-            { name: "Tenure", importance: 38 },
-            { name: "Monthly Charges", importance: 25 },
-            { name: "Total Charges", importance: 18 },
-            { name: "Contract Type", importance: 12 },
-            { name: "Internet Service", importance: 7 }
-          ]);
-          setPredictInputs({ tenure: 18, monthly_charges: 70, total_charges: 1260 });
-        } else if (selectedDataset === "titanic") {
-          setFeatureImportance([
-            { name: "Sex (Female)", importance: 45 },
-            { name: "Passenger Class", importance: 22 },
-            { name: "Age", importance: 15 },
-            { name: "Fare Paid", importance: 10 },
-            { name: "Siblings/Spouses", importance: 8 }
-          ]);
-          setPredictInputs({ age: 28, fare: 32, pclass: 1 });
-        } else if (selectedDataset === "uploaded" && uploadedData) {
-          let remainingWeight = 100;
-          const importances = selectedFeatures.map((feat, idx) => {
-            const weight = idx === selectedFeatures.length - 1 
-              ? remainingWeight 
-              : Math.max(2, Math.round(remainingWeight * (0.35 + Math.random() * 0.2)));
-            remainingWeight = Math.max(0, remainingWeight - weight);
-            return { name: feat, importance: weight };
-          }).sort((a, b) => b.importance - a.importance);
-          setFeatureImportance(importances);
-
-          const defaultInputs: any = {};
-          selectedFeatures.forEach(feat => {
-            const colStat = uploadedData.stats.find(s => s.column === feat);
-            defaultInputs[feat] = colStat?.type === "Numeric" ? colStat.mean ?? 10 : "Sample";
-          });
-          setPredictInputs(defaultInputs);
+        if (isLiveBackend) {
+          fetch("http://localhost:8000/api/scan", { method: "POST" })
+            .then(res => res.json())
+            .then(data => {
+              setLastScanResult(data);
+              setIsSimulating(false);
+              const finalIntegrity = data.integrity_score;
+              const finalLatency = data.scan_latency_ms;
+              const finalErrorRate = data.corrupted_count > 0 ? (data.corrupted_count / data.files_checked) * 100 : 0;
+              const realMetrics = Array.from({ length: maxSteps }, (_, idx) => {
+                const step = idx + 1;
+                const ratio = step / maxSteps;
+                return {
+                  step: step,
+                  integrity: Math.min(100, Number((100 - (100 - finalIntegrity) * ratio).toFixed(2))),
+                  latency: Number((finalLatency + (maxSteps - step) * 2).toFixed(2)),
+                  errorRate: Number((finalErrorRate * ratio).toFixed(2))
+                };
+              });
+              setSimMetrics(realMetrics);
+              fetchFiles();
+              fetchLogs();
+              setPlaygroundActiveTab("live_files" as any);
+            })
+            .catch(() => {
+              setIsSimulating(false);
+            });
         } else {
-          setFeatureImportance([
-            { name: "Median Income", importance: 52 },
-            { name: "House Age", importance: 18 },
-            { name: "Average Rooms", importance: 15 },
-            { name: "Latitude/Longitude", importance: 10 },
-            { name: "Population Density", importance: 5 }
-          ]);
-          setPredictInputs({ income: 5.5, house_age: 15, rooms: 6 });
+          setIsSimulating(false);
+          // Set yield drivers importance
+          if (selectedDirectory === "etc") {
+            setCorruptionDrivers([
+              { name: "Disk Write Load", weight: 38 },
+              { name: "Hardware Aging", weight: 26 },
+              { name: "Kernel Interrupts", weight: 18 },
+              { name: "File Size", weight: 12 },
+              { name: "Packet Drops", weight: 6 }
+            ]);
+            setPredictInputs({ file_path: "/etc/hosts", current_checksum: "a492b9", expected_checksum: "a492b9" });
+          } else if (selectedDirectory === "var") {
+            setCorruptionDrivers([
+              { name: "Buffer Allocations", weight: 45 },
+              { name: "Database Locks", weight: 22 },
+              { name: "Transaction Vol", weight: 15 },
+              { name: "Disk Sector Heat", weight: 10 },
+              { name: "User Access Rate", weight: 8 }
+            ]);
+            setPredictInputs({ file_path: "/var/lib/mysql", current_checksum: "bf82d0", expected_checksum: "bf82d3" });
+          } else if (selectedDirectory === "uploaded" && uploadedData) {
+            let remainingWeight = 100;
+            const importances = selectedFeatures.map((feat, idx) => {
+              const weight = idx === selectedFeatures.length - 1 
+                ? remainingWeight 
+                : Math.max(2, Math.round(remainingWeight * (0.35 + Math.random() * 0.2)));
+              remainingWeight = Math.max(0, remainingWeight - weight);
+              return { name: feat, weight: weight };
+            }).sort((a, b) => b.weight - a.weight);
+            setCorruptionDrivers(importances);
+
+            const defaultInputs: any = {};
+            selectedFeatures.forEach(feat => {
+              const colStat = uploadedData.stats.find(s => s.column === feat);
+              defaultInputs[feat] = colStat?.type === "Numeric" ? colStat.mean ?? 10 : "Sample";
+            });
+            setPredictInputs(defaultInputs);
+          } else {
+            setCorruptionDrivers([
+              { name: "Library Mismatch", weight: 41 },
+              { name: "Dynamic Linker Fail", weight: 28 },
+              { name: "Bad Block Sector", weight: 16 },
+              { name: "Unclean Shutdown", weight: 9 },
+              { name: "IPFS Sync Delay", weight: 6 }
+            ]);
+            setPredictInputs({ file_path: "/usr/bin/bash", current_checksum: "2f8a91", expected_checksum: "2f8a91" });
+          }
         }
       }
     }, 150);
@@ -352,25 +430,10 @@ export default function Platform() {
     setIsPredicting(true);
     setTimeout(() => {
       setIsPredicting(false);
-      if (selectedDataset === "churn") {
-        const churnRisk = predictInputs.tenure < 12 && predictInputs.monthly_charges > 60 ? "HIGH CHURN RISK (82%)" : "LOW RISK (15%)";
-        setPredictOutput(churnRisk);
-      } else if (selectedDataset === "titanic") {
-        const survive = predictInputs.pclass === 1 || predictInputs.age < 12 ? "SURVIVED (88% Confidence)" : "DID NOT SURVIVE (74% Confidence)";
-        setPredictOutput(survive);
-      } else if (selectedDataset === "uploaded" && uploadedData) {
-        const targetStat = uploadedData.stats.find(s => s.column === targetColumn);
-        if (targetStat?.type === "Numeric") {
-          const val = Number(((targetStat.mean ?? 10) * (0.85 + Math.random() * 0.3)).toFixed(2));
-          setPredictOutput(`PREDICTED ${targetColumn.toUpperCase()}: ${val}`);
-        } else {
-          const options = ["TRUE/POSITIVE (83% Probability)", "FALSE/NEGATIVE (79% Probability)"];
-          const randOpt = options[Math.floor(Math.random() * options.length)];
-          setPredictOutput(`PREDICTED ${targetColumn.toUpperCase()}: ${randOpt}`);
-        }
+      if (predictInputs.current_checksum === predictInputs.expected_checksum) {
+        setPredictOutput("SECURE - Cryptographic Checksums Match.");
       } else {
-        const price = Math.round((predictInputs.income * 62000) + (predictInputs.house_age * 1200) + (predictInputs.rooms * 8000));
-        setPredictOutput(`ESTIMATED VALUE: $${price.toLocaleString()}`);
+        setPredictOutput("ALERT - Checksum Mismatch! Data Corrupted.");
       }
     }, 800);
   };
@@ -379,28 +442,28 @@ export default function Platform() {
   const handleRunPipeline = () => {
     setIsPipelineRunning(true);
     setPipelineStep(1);
-    setPipelineLogs(["[00:01] Initializing visual pipeline environment..."]);
+    setPipelineLogs(["[00:01] Initializing syslog ingestion pipeline..."]);
 
     const timers = [
       setTimeout(() => {
         setPipelineStep(2);
-        setPipelineLogs(l => [...l, "[00:03] Connectors validated. Syncing S3 Revenue Data (62,400 rows)..."]);
+        setPipelineLogs(l => [...l, "[00:03] Pipeline validated. Ingesting syslog records from Node-East (14,200 events)..."]);
       }, 1500),
       setTimeout(() => {
         setPipelineStep(3);
-        setPipelineLogs(l => [...l, "[00:06] Applying scale normalization & imputing 42 null variables..."]);
+        setPipelineLogs(l => [...l, "[00:06] Applying regex parsing & scanning indicators of compromise (IOC)..."]);
       }, 3000),
       setTimeout(() => {
         setPipelineStep(4);
-        setPipelineLogs(l => [...l, "[00:09] Training parallel sweeps with hyperparameter XGBoost algorithm..."]);
+        setPipelineLogs(l => [...l, "[00:09] Running data integrity validations & checksum hash matching..."]);
       }, 4500),
       setTimeout(() => {
         setPipelineStep(5);
-        setPipelineLogs(l => [...l, "[00:11] Model testing finalized. Validation score: 96.8% (AUC-ROC)."]);
+        setPipelineLogs(l => [...l, "[00:11] Syslog check finalized. Ingestion sync latency: 12ms."]);
       }, 6000),
       setTimeout(() => {
         setPipelineStep(6);
-        setPipelineLogs(l => [...l, "[00:13] Exported models weights. Deployed REST Endpoint: /api/v1/s3-revenue."]);
+        setPipelineLogs(l => [...l, "[00:13] Containment webhook active. Target Alert Endpoint: /api/v1/containment."]);
         setIsPipelineRunning(false);
       }, 7500)
     ];
@@ -421,38 +484,38 @@ export default function Platform() {
     setTimeout(() => {
       let reply: any = { sender: "ai", text: "" };
 
-      if (query.toLowerCase().includes("spend") || query.toLowerCase().includes("conversion")) {
-        reply.text = "Here is the campaign analysis showing Marketing Spend vs Conversion Rates. We notice a clear saturation point after $5,000 in monthly ad expenditure.";
+      if (query.toLowerCase().includes("incident") || query.toLowerCase().includes("corruption") || query.toLowerCase().includes("report")) {
+        reply.text = "Here is the monthly log of data corruption incidents across active servers. Checksum failures peaked in Server-East-04 due to disk sector degradation.";
         reply.chartType = "bar";
         reply.chartData = [
-          { name: "$1K Spend", Conversion: 2.1, Cost: 1000 },
-          { name: "$2.5K Spend", Conversion: 4.8, Cost: 2500 },
-          { name: "$5K Spend", Conversion: 8.2, Cost: 5000 },
-          { name: "$7.5K Spend", Conversion: 8.9, Cost: 7500 },
-          { name: "$10K Spend", Conversion: 9.1, Cost: 10000 }
+          { name: "Server-East-01", Conversion: 1 },
+          { name: "Server-East-04", Conversion: 12 },
+          { name: "DB-Pool-Main", Conversion: 0 },
+          { name: "Cache-Node-01", Conversion: 3 },
+          { name: "Static-Storage", Conversion: 2 }
         ];
-      } else if (query.toLowerCase().includes("latency") || query.toLowerCase().includes("anomaly")) {
-        reply.text = "I've scanned the active S3 pipeline latency logs. I detected one ingestion anomaly at 14:00 where latency peaked at 740ms due to a node reboot. Auto-recovery handled the state.";
+      } else if (query.toLowerCase().includes("latency") || query.toLowerCase().includes("scan") || query.toLowerCase().includes("performance")) {
+        reply.text = "I've scanned the active directory check latencies. Scans spiked to 120ms at 14:00 during file system indexing but recovered immediately.";
         reply.chartType = "line";
         reply.chartData = [
-          { time: "10:00", Latency: 120 },
-          { time: "12:00", Latency: 140 },
-          { time: "14:00", Latency: 740 },
-          { time: "16:00", Latency: 130 },
-          { time: "18:00", Latency: 110 }
+          { time: "10:00", Latency: 12 },
+          { time: "12:00", Latency: 15 },
+          { time: "14:00", Latency: 120 },
+          { time: "16:00", Latency: 22 },
+          { time: "18:00", Latency: 11 }
         ];
-      } else if (query.toLowerCase().includes("report") || query.toLowerCase().includes("q3")) {
-        reply.text = "NovaMind Predictor has generated your Q3 forecast overview. Based on active subscription trajectories, we anticipate MRR to reach $2.84M with 92% confidence.";
+      } else if (query.toLowerCase().includes("integrity") || query.toLowerCase().includes("uptime")) {
+        reply.text = "Here is the projected data integrity SLA score for the upcoming quarter. We forecast maintaining a 99.99% integrity level.";
         reply.chartType = "area";
         reply.chartData = [
-          { month: "May", Revenue: 2.1 },
-          { month: "Jun", Revenue: 2.4 },
-          { month: "Jul (Est)", Revenue: 2.55 },
-          { month: "Aug (Est)", Revenue: 2.70 },
-          { month: "Sep (Est)", Revenue: 2.84 }
+          { month: "May", Revenue: 99.85 },
+          { month: "Jun", Revenue: 99.91 },
+          { month: "Jul (Est)", Revenue: 99.95 },
+          { month: "Aug (Est)", Revenue: 99.98 },
+          { month: "Sep (Est)", Revenue: 99.99 }
         ];
       } else {
-        reply.text = `I've registered your request regarding: "${query}". On NovaMind Cloud, you can configure hyperparameters, connect data nodes, and run client-side inferences. Try clicking on one of the default prompt chips below for a visual showcase.`;
+        reply.text = `I've registered your request regarding: "${query}". On Nova AI, you can configure directory scans, simulate data corruption sweeps, and test containment webhooks. Try using one of the pre-built prompt chips below.`;
       }
 
       setChatHistory(c => [...c, reply]);
@@ -472,8 +535,8 @@ export default function Platform() {
     setTimeout(() => {
       setIsForecasting(false);
       
-      const baseVal = selectedForecastMetric === "mrr" ? 2200000 : selectedForecastMetric === "users" ? 48000 : 1500;
-      const multiplier = selectedForecastMetric === "mrr" ? 1.05 : selectedForecastMetric === "users" ? 1.03 : 1.08;
+      const baseVal = selectedForecastMetric === "incidents" ? 1.5 : selectedForecastMetric === "users" ? 99.9 : 12;
+      const multiplier = selectedForecastMetric === "incidents" ? 1.05 : selectedForecastMetric === "users" ? 0.999 : 1.08;
       
       const tempForecast: any[] = [];
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -482,19 +545,19 @@ export default function Platform() {
       for (let i = 0; i < 6; i++) {
         tempForecast.push({
           name: months[i],
-          Historical: Math.round(baseVal * Math.pow(multiplier, i - 5))
+          Historical: Math.round(baseVal * Math.pow(multiplier, i - 5) * 100) / 100
         });
       }
       // Forecast
       let lastHist = tempForecast[tempForecast.length - 1].Historical;
       for (let i = 6; i < 12; i++) {
-        const val = Math.round(lastHist * Math.pow(multiplier, i - 5));
-        const confInterval = Math.round(val * 0.08 * (i - 5));
+        const val = Math.round(lastHist * Math.pow(multiplier, i - 5) * 100) / 100;
+        const confInterval = Math.round(val * 0.08 * (i - 5) * 100) / 100;
         tempForecast.push({
           name: months[i],
           Forecast: val,
-          Upper: val + confInterval,
-          Lower: Math.max(0, val - confInterval)
+          Upper: Math.round((val + confInterval) * 100) / 100,
+          Lower: Math.max(0, Math.round((val - confInterval) * 100) / 100)
         });
       }
       
@@ -502,7 +565,7 @@ export default function Platform() {
     }, 1500);
   };
 
-  // --- API DEPLOYMENTS FUNCTIONS ---
+  // --- ORACLE WEBHOOKS FUNCTIONS ---
   const handleTestApi = () => {
     setIsApiTesting(true);
     setApiTesterOutput("");
@@ -511,19 +574,20 @@ export default function Platform() {
       setIsApiTesting(false);
       try {
         const parsed = JSON.parse(apiTesterInput);
-        const randRisk = Math.floor(Math.random() * 85) + 10;
+        const randVal = Math.floor(Math.random() * 85) + 10;
         const responseObj = {
           status: "200_OK",
-          model: apiTesterEndpoint,
+          webhook: apiTesterEndpoint,
           timestamp: new Date().toISOString(),
-          prediction: {
-            probability: Number((randRisk / 100).toFixed(4)),
-            label: randRisk > 50 ? "CHURN_RISK" : "NO_RISK",
-            action: randRisk > 50 ? "Trigger customer retention voucher" : "Standard cycle sync"
+          containment_details: {
+            node_quarantined: parsed.target_node ? parsed.target_node : "Default-East-01",
+            network_rule_applied: parsed.quarantine_network ? "Block route from " + parsed.quarantine_network : "No rule applied",
+            remediation_state: randVal > 50 ? "ISOLATION_COMPLETE" : "MONITOR_ONLY",
+            action: randVal > 50 ? "Dispatched quarantine alert to PagerDuty" : "Logged diagnostic details"
           },
           infrastructure: {
-            latency_ms: Math.floor(Math.random() * 45) + 12,
-            compute_engine: "NVIDIA-T4-Shared-Slot",
+            latency_ms: Math.floor(Math.random() * 20) + 5,
+            broker_node: "Local-Gateway-WAF",
             rate_limit_remaining: rateLimit - 1
           }
         };
@@ -537,7 +601,7 @@ export default function Platform() {
   // --- SETTINGS KEY GENERATOR ---
   const handleGenerateApiKey = () => {
     const bytes = Array.from({ length: 22 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
-    setApiKey(`nm_live_${bytes}`);
+    setApiKey(`na_live_${bytes}`);
     setGeneratedKeyMsg(true);
     setTimeout(() => setGeneratedKeyMsg(false), 3000);
   };
@@ -553,7 +617,7 @@ export default function Platform() {
       <aside className="w-64 border-r border-slate-900 bg-slate-950 flex flex-col justify-between fixed h-[calc(100vh-64px)] z-20">
         <div className="p-6">
           <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6">
-            Cloud Workspace
+            Incident Workspace
           </div>
           <nav className="space-y-1.5">
             {menuItems.map((item) => (
@@ -562,7 +626,7 @@ export default function Platform() {
                 onClick={() => setActiveSection(item.label)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold tracking-wide transition-all outline-none ${
                   activeSection === item.label 
-                    ? "bg-blue-600/10 text-blue-400 border-l-2 border-blue-500" 
+                    ? "bg-red-600/10 text-red-400 border-l-2 border-red-500" 
                     : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
                 }`}
               >
@@ -575,7 +639,7 @@ export default function Platform() {
 
         {/* User profile capsule in sidebar */}
         <div className="p-4 border-t border-slate-900 bg-slate-950/60 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 font-bold flex items-center justify-center text-sm border border-blue-500/10">
+          <div className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 font-bold flex items-center justify-center text-sm border border-red-500/10">
             SD
           </div>
           <div className="truncate">
@@ -589,30 +653,38 @@ export default function Platform() {
       <div className="flex-1 ml-64 min-h-[calc(100vh-64px)] bg-grid-dots p-8 relative overflow-x-hidden">
         
         {/* Breathing ambient glow orbs */}
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-red-500/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="max-w-6xl mx-auto space-y-8 relative z-10">
 
           {/* ────────────────────────────────────────────────────────
               SECTION 1: DASHBOARD OVERVIEW 
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "Dashboard" && (
+          {activeSection === "Incident Dashboard" && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <Activity className="w-6 h-6 text-blue-400" />
-                  MOCK OPS COCKPIT
-                </h1>
-                <p className="text-slate-400 text-xs mt-1">Real-time status overview of active models and automated pipelines.</p>
+              <div className="flex justify-between items-start sm:items-center flex-col sm:flex-row gap-4">
+                <div>
+                  <h1 className="text-2xl font-black text-white flex items-center gap-2">
+                    <Activity className="w-6 h-6 text-red-400" />
+                    INCIDENT COCKPIT
+                  </h1>
+                  <p className="text-slate-400 text-xs mt-1">Real-time status overview of directory scanning agents, integrity ratios, and alerts.</p>
+                </div>
+                {isLiveBackend && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-[10px] font-extrabold uppercase tracking-widest font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Live FIM Daemon Active
+                  </span>
+                )}
               </div>
 
               {/* KPI metrics row */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {[
-                  { label: "Active Pipelines", value: "6 Deployed", change: "99.9% Success", color: "text-blue-400" },
-                  { label: "Daily Inferences", value: "12,482,904", change: "+14.2% Growth", color: "text-cyan-400" },
-                  { label: "Avg API Response", value: "32ms", change: "SLA Compliant", color: "text-emerald-400" },
-                  { label: "Simulated GPU Cost", value: "$182.40", change: "-8% Saved (Spot)", color: "text-indigo-400" }
+                  { label: "Active Sensors", value: "2,482 Sensors", change: "99.99% Uptime", color: "text-red-400" },
+                  { label: "Data Integrity Rate", value: "99.982%", change: "+0.004% Change", color: "text-orange-400" },
+                  { label: "Mean Time to Detect", value: "12ms", change: "SLA Compliant", color: "text-emerald-400" },
+                  { label: "Active Outage Alerts", value: "4 Incidents", change: "3 Quarantined", color: "text-indigo-400" }
                 ].map((kpi, idx) => (
                   <div key={idx} className="p-5 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl">
                     <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{kpi.label}</div>
@@ -627,31 +699,31 @@ export default function Platform() {
                 
                 {/* Chart 1: Ingestion throughput */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/20 backdrop-blur-xl space-y-4">
-                  <h3 className="text-white font-bold text-sm">Ingestion Pipeline Load (MB/s)</h3>
+                  <h3 className="text-white font-bold text-sm">System Ingestion & Checksum Volumes (kB/s)</h3>
                   <div className="h-64 text-xs font-mono">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart
                         data={[
-                          { name: "10:00", S3: 45, Postgres: 25 },
-                          { name: "11:00", S3: 65, Postgres: 30 },
-                          { name: "12:00", S3: 50, Postgres: 22 },
-                          { name: "13:00", S3: 90, Postgres: 45 },
-                          { name: "14:00", S3: 75, Postgres: 35 },
-                          { name: "15:00", S3: 120, Postgres: 55 }
+                          { name: "10:00", Scans: 45, Errors: 2 },
+                          { name: "11:00", Scans: 65, Errors: 4 },
+                          { name: "12:00", Scans: 50, Errors: 1 },
+                          { name: "13:00", Scans: 90, Errors: 12 },
+                          { name: "14:00", Scans: 75, Errors: 8 },
+                          { name: "15:00", Scans: 120, Errors: 3 }
                         ]}
                       >
                         <defs>
-                          <linearGradient id="colorS3" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          <linearGradient id="colorScans" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
                         <XAxis dataKey="name" stroke="#64748b" />
                         <YAxis stroke="#64748b" />
                         <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                        <Area type="monotone" dataKey="S3" stroke="#3b82f6" fillOpacity={1} fill="url(#colorS3)" />
-                        <Line type="monotone" dataKey="Postgres" stroke="#06b6d4" />
+                        <Area type="monotone" dataKey="Scans" stroke="#f43f5e" fillOpacity={1} fill="url(#colorScans)" />
+                        <Line type="monotone" dataKey="Errors" stroke="#fb923c" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -659,23 +731,23 @@ export default function Platform() {
 
                 {/* Chart 2: Inference distribution */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/20 backdrop-blur-xl space-y-4">
-                  <h3 className="text-white font-bold text-sm">Inference Latency Percentiles (ms)</h3>
+                  <h3 className="text-white font-bold text-sm">Integrity Scan Latencies (ms)</h3>
                   <div className="h-64 text-xs font-mono">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={[
-                          { name: "churn-model", p50: 12, p95: 28, p99: 45 },
-                          { name: "fraud-mlp", p50: 22, p95: 42, p99: 90 },
-                          { name: "housing-rf", p50: 8, p95: 18, p99: 32 }
+                          { name: "/etc Configs", p50: 8, p95: 14, p99: 25 },
+                          { name: "/var/lib DBs", p50: 22, p95: 45, p99: 98 },
+                          { name: "/usr Binaries", p50: 10, p95: 18, p99: 30 }
                         ]}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
                         <XAxis dataKey="name" stroke="#64748b" />
                         <YAxis stroke="#64748b" />
                         <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                        <Bar dataKey="p50" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="p95" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="p99" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="p50" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="p95" fill="#f97316" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="p99" fill="#eab308" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -683,13 +755,42 @@ export default function Platform() {
 
               </div>
 
+              {/* Live Security logs terminal */}
+              {isLiveBackend && (
+                <div className="p-6 rounded-2xl border border-slate-900 bg-slate-950/80 backdrop-blur-xl space-y-3 font-mono">
+                  <div className="flex justify-between items-center pb-2 border-b border-slate-900">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Sentinel Alert Registry Logs</span>
+                    <span className="text-[10px] text-red-400 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                      LIVE SECURE FEED
+                    </span>
+                  </div>
+                  <div className="space-y-1 text-[10px] max-h-40 overflow-y-auto scrollbar-thin">
+                    {liveLogs.map((log: any, lIdx: number) => (
+                      <div key={lIdx} className="flex gap-2">
+                        <span className="text-slate-500">[{log.timestamp}]</span>
+                        <span className={`font-bold ${
+                          log.type === "Warning Event" ? "text-red-400" :
+                          log.type === "Integrity Scanner" ? "text-orange-400" :
+                          "text-slate-400"
+                        }`}>{log.type}:</span>
+                        <span className="text-slate-300">{log.message}</span>
+                      </div>
+                    ))}
+                    {liveLogs.length === 0 && (
+                      <div className="text-slate-600 text-center py-4">No audit logs recorded yet. Run a baseline or scan.</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Real-time ML suggestions banner */}
-              <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5 flex items-start gap-4">
-                <Brain className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="p-5 rounded-2xl border border-red-500/20 bg-red-500/5 flex items-start gap-4">
+                <Brain className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div className="text-xs space-y-1">
-                  <h4 className="text-white font-bold">🤖 ML Copilot Insight Recommendation</h4>
+                  <h4 className="text-white font-bold">🤖 Incident Copilot Diagnostics Recommendation</h4>
                   <p className="text-slate-400 leading-relaxed">
-                    XGBoost hyperparameter logs indicate high variance. We recommend raising **n_estimators to 150** and adjusting learning_rate to **0.03** to reduce overfitting validation errors.
+                    Check-sum scans for directory `/var/lib/mysql` indicate continuous file system warnings. We recommend migrating transaction log buffers to `/var/backup-node-02` and executing an automated rollback repair sweep.
                   </p>
                 </div>
               </div>
@@ -697,35 +798,35 @@ export default function Platform() {
           )}
 
           {/* ────────────────────────────────────────────────────────
-              SECTION 2: ML PLAYGROUND & MODELER
+              SECTION 2: CORRUPTION DIAGNOSTICS SANDBOX
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "ML Playground" && (
+          {activeSection === "Corruption Sandbox" && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <Brain className="w-6 h-6 text-blue-400" />
-                  INTERACTIVE ML PLAYGROUND
+                  <Shield className="w-6 h-6 text-red-500" />
+                  CORRUPTION SANDBOX
                 </h1>
-                <p className="text-slate-400 text-xs mt-1">Configure models, sweeps, and watch client-side training loops run live.</p>
+                <p className="text-slate-400 text-xs mt-1">Configure scan boundaries, adjust depth sizes, and watch cryptographic checksum validation loops run live.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                 
-                {/* Modeler hyperparameter cards */}
+                {/* Configuration panel */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl space-y-6">
                   <div>
-                    <h3 className="text-white font-bold text-sm mb-1">Compute Configuration</h3>
-                    <p className="text-slate-500 text-[10px]">Tweak hyperparameter sweep bounds</p>
+                    <h3 className="text-white font-bold text-sm mb-1">Scan Configuration</h3>
+                    <p className="text-slate-500 text-[10px]">Tweak hash validations & buffer limits</p>
                   </div>
 
                   <div className="space-y-4 text-xs">
                     <div>
-                      <label className="block text-slate-400 font-medium mb-1.5">Select Dataset</label>
+                      <label className="block text-slate-400 font-medium mb-1.5">Select Server Directory</label>
                       <select 
-                        value={selectedDataset}
+                        value={selectedDirectory}
                         onChange={e => {
                           const val = e.target.value;
-                          setSelectedDataset(val);
+                          setSelectedDirectory(val);
                           setPredictOutput(null);
                           if (val === "uploaded" && uploadedData) {
                             setPlaygroundActiveTab("summary");
@@ -733,10 +834,13 @@ export default function Platform() {
                         }}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 outline-none text-xs font-semibold"
                       >
-                        <option value="churn">Customer Churn Logs (Classification)</option>
-                        <option value="titanic">Titanic Survival Specs (Binary Class)</option>
-                        <option value="housing">California House Prices (Regression)</option>
-                        <option value="upload">📁 Upload Custom CSV/JSON...</option>
+                        {isLiveBackend && (
+                          <option value="live_sandbox">🔍 sandbox_files/ (Real Checksums)</option>
+                        )}
+                        <option value="etc">/etc (System Configuration Files)</option>
+                        <option value="var">/var/lib (Database Storage Files)</option>
+                        <option value="usr">/usr/bin (Core System Binaries)</option>
+                        <option value="upload">📁 Upload Custom Syslog CSV/JSON...</option>
                         {uploadedData && (
                           <option value="uploaded">📊 Custom: {uploadedData.name}</option>
                         )}
@@ -744,20 +848,21 @@ export default function Platform() {
                     </div>
 
                     {/* Drag-and-drop file upload zone */}
-                    {selectedDataset === "upload" && (
+                    {selectedDirectory === "upload" && (
                       <div className="p-4 rounded-xl border border-dashed border-slate-800 bg-slate-950/40 text-center space-y-3 relative">
                         {isParsing ? (
                           <div className="py-6 flex flex-col items-center justify-center space-y-2">
-                            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                            <span className="text-[10px] text-slate-400 font-mono">PARSING DATASET...</span>
+                            <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                            <span className="text-[10px] text-slate-400 font-mono">PARSING CHECKSUM LOG...</span>
                           </div>
                         ) : (
                           <div className="py-6 flex flex-col items-center justify-center space-y-2 cursor-pointer group">
-                            <Upload className="w-8 h-8 text-slate-600 group-hover:text-blue-500 transition-colors mb-1" />
+                            <Upload className="w-8 h-8 text-slate-600 group-hover:text-red-500 transition-colors mb-1" />
                             <span className="text-xs font-bold text-slate-300 group-hover:text-white">Choose a CSV or JSON file</span>
                             <span className="text-[9px] text-slate-600">Drag & drop or click to browse</span>
                             <input 
                               type="file" 
+                              required
                               accept=".csv,.json" 
                               onChange={handleFileUpload} 
                               className="absolute inset-0 opacity-0 cursor-pointer" 
@@ -768,7 +873,7 @@ export default function Platform() {
                     )}
 
                     {/* Dynamic config for uploaded data */}
-                    {selectedDataset === "uploaded" && uploadedData && (
+                    {selectedDirectory === "uploaded" && uploadedData && (
                       <div className="space-y-4 pt-2 border-t border-slate-900/50">
                         <div>
                           <label className="block text-slate-400 font-medium mb-1.5">Target Label Column</label>
@@ -777,7 +882,6 @@ export default function Platform() {
                             onChange={e => {
                               const val = e.target.value;
                               setTargetColumn(val);
-                              // Remove target from features list
                               setSelectedFeatures(uploadedData.headers.filter(h => h !== val));
                               setPredictOutput(null);
                             }}
@@ -808,7 +912,7 @@ export default function Platform() {
                                       }
                                       setPredictOutput(null);
                                     }}
-                                    className="rounded border-slate-800 bg-slate-900 text-blue-600 focus:ring-0 w-3.5 h-3.5"
+                                    className="rounded border-slate-800 bg-slate-900 text-red-600 focus:ring-0 w-3.5 h-3.5"
                                   />
                                   <span className="font-mono text-[10px] truncate">{h}</span>
                                 </label>
@@ -819,70 +923,70 @@ export default function Platform() {
                       </div>
                     )}
 
-                    {selectedDataset !== "upload" && (
+                    {selectedDirectory !== "upload" && (
                       <>
                         <div>
-                          <label className="block text-slate-400 font-medium mb-1.5">Model Algorithm</label>
+                          <label className="block text-slate-400 font-medium mb-1.5">Detection Engine</label>
                           <select 
-                            value={selectedModel}
+                            value={selectedEngine}
                             onChange={e => {
-                              setSelectedModel(e.target.value);
+                              setSelectedEngine(e.target.value);
                               setPredictOutput(null);
                             }}
                             className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 outline-none"
                           >
-                            <option value="xgboost">XGBoost Decision Classifier</option>
-                            <option value="mlp">Multi-Layer Neural Network (MLP)</option>
-                            <option value="rf">Random Forest Regressor</option>
+                            <option value="sha256">SHA-256 Checksum Validator</option>
+                            <option value="lstm">Heuristic File Anomaly Scanner</option>
+                            <option value="kelly">Metadata Correlation Engine</option>
                           </select>
                         </div>
 
                         {/* Sweeps controllers */}
                         <div className="space-y-3 pt-2">
                           <div className="flex justify-between text-[11px]">
-                            <span className="text-slate-500">Learning Rate (Alpha)</span>
-                            <span className="text-blue-400 font-mono font-bold">{lr}</span>
+                            <span className="text-slate-500">Target Integrity Rating (%)</span>
+                            <span className="text-red-400 font-mono font-bold">{targetIntegrity}%</span>
                           </div>
                           <input 
-                            type="range" min="0.01" max="0.3" step="0.01" value={lr} 
-                            onChange={e => setLr(Number(e.target.value))}
-                            className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                            type="range" min="90.0" max="100.0" step="0.1" value={targetIntegrity} 
+                            onChange={e => setTargetIntegrity(Number(e.target.value))}
+                            className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-red-500" 
                           />
 
                           <div className="flex justify-between text-[11px]">
-                            <span className="text-slate-500">Max Depth Bounds</span>
-                            <span className="text-blue-400 font-mono font-bold">{depth}</span>
+                            <span className="text-slate-500">Scan Directory Depth</span>
+                            <span className="text-red-400 font-mono font-bold">{scanDepth} levels</span>
                           </div>
                           <input 
-                            type="range" min="2" max="12" step="1" value={depth} 
-                            onChange={e => setDepth(Number(e.target.value))}
-                            className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                            type="range" min="1" max="6" step="1" value={scanDepth} 
+                            onChange={e => setScanDepth(Number(e.target.value))}
+                            className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-red-500" 
                           />
 
-                          {selectedModel === "xgboost" && (
+                          {selectedEngine === "sha256" && (
                             <>
                               <div className="flex justify-between text-[11px]">
-                                <span className="text-slate-500">Num Estimators (Trees)</span>
-                                <span className="text-blue-400 font-mono font-bold">{trees}</span>
+                                <span className="text-slate-500">File Ingestion Buffer Limit</span>
+                                <span className="text-red-400 font-mono font-bold">{bufferSize} files</span>
                               </div>
                               <input 
-                                type="range" min="20" max="200" step="10" value={trees} 
-                                onChange={e => setTrees(Number(e.target.value))}
-                                className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                                type="range" min="10" max="200" step="10" value={bufferSize} 
+                                onChange={e => setBufferSize(Number(e.target.value))}
+                                className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-red-500" 
                               />
                             </>
                           )}
 
-                          {selectedModel === "mlp" && (
+                          {selectedEngine === "lstm" && (
                             <>
                               <div className="flex justify-between text-[11px]">
                                 <span className="text-slate-500">Epoch Iterations Limit</span>
-                                <span className="text-blue-400 font-mono font-bold">{epochs}</span>
+                                <span className="text-red-400 font-mono font-bold">{bufferSize} epochs</span>
                               </div>
                               <input 
-                                type="range" min="10" max="100" step="5" value={epochs} 
-                                onChange={e => setEpochs(Number(e.target.value))}
-                                className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                                type="range" min="10" max="100" step="5" value={bufferSize} 
+                                onChange={e => setBufferSize(Number(e.target.value))}
+                                className="w-full h-1 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-red-500" 
                               />
                             </>
                           )}
@@ -891,211 +995,362 @@ export default function Platform() {
                     )}
                   </div>
 
-                  {selectedDataset !== "upload" && (
+                  {selectedDirectory !== "upload" && (
                     <button
-                      onClick={handleRunTraining}
-                      disabled={isTraining}
-                      className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2"
+                      onClick={handleRunSimulation}
+                      disabled={isSimulating}
+                      className="w-full py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/10 transition-all flex items-center justify-center gap-2"
                     >
-                      {isTraining ? (
+                      {isSimulating ? (
                         <>
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          Training Sweep {trainingProgress}%
+                          Scanning Sectors {simProgress}%
                         </>
                       ) : (
                         <>
                           <Play className="w-3.5 h-3.5 fill-current" />
-                          Execute Sweep Training
+                          Execute Integrity Scan
                         </>
                       )}
                     </button>
+                  )}
+
+                  {isLiveBackend && (
+                    <div className="pt-4 border-t border-slate-900 space-y-2.5">
+                      <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold font-mono flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Live FIM Daemon Controls
+                      </div>
+                      
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch("http://localhost:8000/api/baseline", { method: "POST" });
+                              if (res.ok) {
+                                alert("Baseline successfully initialized and backed up.");
+                                fetchFiles();
+                                fetchLogs();
+                              }
+                            } catch (e) {
+                              alert("API communications offline.");
+                            }
+                          }}
+                          className="py-2 px-1 rounded-lg border border-slate-800 bg-slate-950 text-slate-300 hover:text-white text-[9px] font-bold font-mono transition-colors"
+                          title="Generate trusted baseline of sandbox folder"
+                        >
+                          Init Baseline
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch("http://localhost:8000/api/corrupt", { 
+                                method: "POST", 
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({}) 
+                              });
+                              if (res.ok) {
+                                alert("Simulated corruption injected successfully.");
+                                fetchFiles();
+                                fetchLogs();
+                              }
+                            } catch (e) {
+                              alert("API communications offline.");
+                            }
+                          }}
+                          className="py-2 px-1 rounded-lg border border-red-500/20 bg-red-950/20 text-red-400 hover:text-red-300 text-[9px] font-bold font-mono transition-colors"
+                          title="Artificially modify files to trigger integrity failure"
+                        >
+                          Corrupt File
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch("http://localhost:8000/api/restore", { method: "POST" });
+                              if (res.ok) {
+                                alert("Rollback triggered. Baseline files restored.");
+                                fetchFiles();
+                                fetchLogs();
+                              }
+                            } catch (e) {
+                              alert("API communications offline.");
+                            }
+                          }}
+                          className="py-2 px-1 rounded-lg border border-emerald-500/20 bg-emerald-950/20 text-emerald-400 hover:text-emerald-300 text-[9px] font-bold font-mono transition-colors"
+                          title="Rollback all changes from backup copies"
+                        >
+                          Self Heal
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
 
                 {/* Training monitor & Output charts */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/20 backdrop-blur-xl md:col-span-2 space-y-6 min-h-[420px] flex flex-col justify-between">
-                  <div className="flex justify-between items-center pb-3 border-b border-slate-900">
-                    <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                      <Terminal className="w-4 h-4 text-blue-400" />
-                      Sandbox Output Monitor
-                    </h3>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-900">
+                    <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                      <button
+                        onClick={() => setPlaygroundActiveTab("simulation")}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                          playgroundActiveTab === "simulation"
+                            ? "bg-red-600/10 text-red-400 border border-red-500/20"
+                            : "text-slate-500 hover:text-slate-300"
+                        }`}
+                      >
+                        Sector Diagnostics
+                      </button>
+                      <button
+                        onClick={() => setPlaygroundActiveTab("drivers")}
+                        disabled={corruptionDrivers.length === 0}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                          corruptionDrivers.length === 0 ? "opacity-30 cursor-not-allowed" : ""
+                        } ${
+                          playgroundActiveTab === "drivers"
+                            ? "bg-red-600/10 text-red-400 border border-red-500/20"
+                            : "text-slate-500 hover:text-slate-300"
+                        }`}
+                      >
+                        Corruption Drivers
+                      </button>
+                      {uploadedData && (
+                        <button
+                          onClick={() => setPlaygroundActiveTab("summary")}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                            playgroundActiveTab === "summary"
+                              ? "bg-red-600/10 text-red-400 border border-red-500/20"
+                              : "text-slate-500 hover:text-slate-300"
+                          }`}
+                        >
+                          Data Summary
+                        </button>
+                      )}
+                      {isLiveBackend && (
+                        <button
+                          onClick={() => setPlaygroundActiveTab("live_files" as any)}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                            playgroundActiveTab === ("live_files" as any)
+                              ? "bg-red-600/10 text-red-400 border border-red-500/20"
+                              : "text-slate-500 hover:text-slate-300"
+                          }`}
+                        >
+                          Watch Directory (Live)
+                        </button>
+                      )}
+                    </div>
                     <span className="text-[10px] text-slate-500 font-mono uppercase">
-                      {isTraining ? "COMPUTING LOSS" : trainingMetrics.length > 0 ? "TRAINING DONE" : "IDLE"}
+                      {isSimulating ? "RUNNING CHECK-SUM CHECK" : simMetrics.length > 0 ? "SECTOR SCAN COMPLETE" : "IDLE"}
                     </span>
                   </div>
 
-                  {trainingMetrics.length === 0 && !isTraining ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-3">
-                      <Cpu className="w-12 h-12 text-slate-700 animate-pulse" />
-                      <h4 className="text-slate-400 font-bold text-sm">No Active Sweep Logs</h4>
-                      <p className="text-slate-600 text-xs max-w-sm">Select dataset, configure bounds, and click run to watch learning convergence.</p>
-                    </div>
-                  ) : (
-                    <div className="flex-1 space-y-6">
-                      
-                      {/* Metric lines chart */}
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide">Epoch Loss Decay</h4>
-                        <div className="h-44 text-[10px] font-mono">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={trainingMetrics}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.01)" />
-                              <XAxis dataKey="epoch" stroke="#64748b" />
-                              <YAxis stroke="#64748b" />
-                              <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                              <Legend />
-                              <Line type="monotone" dataKey="loss" name="Train Loss" stroke="#3b82f6" dot={false} strokeWidth={2} />
-                              <Line type="monotone" dataKey="valLoss" name="Val Loss" stroke="#f43f5e" dot={false} strokeWidth={2} />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
+                  {/* Tab Contents */}
+                  <div className="flex-1 flex flex-col justify-center">
+                    
+                    {/* Tab 1: SIMULATION GRAPH */}
+                    {playgroundActiveTab === "simulation" && (
+                      <div className="flex-1 flex flex-col justify-center">
+                        {simMetrics.length === 0 && !isSimulating ? (
+                          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-3">
+                            <Cpu className="w-12 h-12 text-slate-700 animate-pulse" />
+                            <h4 className="text-slate-400 font-bold text-sm">No Active Diagnostic Scans</h4>
+                            <p className="text-slate-600 text-xs max-w-sm">Select directory, configure targets, and execute sweeps to view real-time sector logs.</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide">Data Integrity & Outage Risk</h4>
+                            <div className="h-44 text-[10px] font-mono">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={simMetrics}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.01)" />
+                                  <XAxis dataKey="step" stroke="#64748b" />
+                                  <YAxis stroke="#64748b" />
+                                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
+                                  <Legend />
+                                  <Line type="monotone" dataKey="integrity" name="System Integrity (%)" stroke="#f43f5e" dot={false} strokeWidth={2} />
+                                  <Line type="monotone" dataKey="errorRate" name="Corruption Rate (%)" stroke="#eab308" dot={false} strokeWidth={2} />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        )}
                       </div>
+                    )}
 
-                      {/* Performance Bar Chart / Importance */}
-                      {featureImportance.length > 0 && !isTraining && (
-                        <div className="space-y-2 pt-2 border-t border-slate-900">
-                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide">Feature Importance Weights (%)</h4>
-                          <div className="h-36 text-[10px] font-mono">
-                            <ResponsiveContainer width="100%" height="100%">
-                              <BarChart data={featureImportance} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.01)" />
-                                <XAxis type="number" stroke="#64748b" />
-                                <YAxis dataKey="name" type="category" stroke="#64748b" width={90} />
-                                <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                                <Bar dataKey="importance" fill="#06b6d4" radius={[0, 4, 4, 0]} />
-                              </BarChart>
-                            </ResponsiveContainer>
+                    {/* Tab 2: DRIVERS WEIGHT */}
+                    {playgroundActiveTab === "drivers" && (
+                      <div className="flex-1 flex flex-col justify-center">
+                        {corruptionDrivers.length === 0 ? (
+                          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-3">
+                            <Sliders className="w-12 h-12 text-slate-700 animate-pulse" />
+                            <h4 className="text-slate-400 font-bold text-sm">No Drivers Evaluated</h4>
+                            <p className="text-slate-600 text-xs max-w-sm">Execute an integrity scan to map primary corruption factors.</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide">Corruption Factors Weights (%)</h4>
+                            <div className="h-44 text-[10px] font-mono">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={corruptionDrivers} layout="vertical">
+                                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.01)" />
+                                  <XAxis type="number" stroke="#64748b" />
+                                  <YAxis dataKey="name" type="category" stroke="#64748b" width={90} />
+                                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
+                                  <Bar dataKey="weight" fill="#f97316" radius={[0, 4, 4, 0]} />
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab 3: SUMMARY */}
+                    {playgroundActiveTab === "summary" && uploadedData && (
+                      <div className="space-y-4 overflow-y-auto max-h-[300px] scrollbar-thin pr-1 text-xs">
+                        <div className="p-3.5 rounded-xl border border-slate-900 bg-slate-950/80 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 flex-shrink-0">
+                              <FileSpreadsheet className="w-5 h-5" />
+                            </div>
+                            <div className="truncate">
+                              <div className="text-white font-bold truncate max-w-[200px]">{uploadedData.name}</div>
+                              <div className="text-[10px] text-slate-500">{uploadedData.size}</div>
+                            </div>
+                          </div>
+                          <div className="flex gap-4 text-center font-mono">
+                            <div>
+                              <div className="text-slate-500 text-[9px] uppercase font-bold">Rows</div>
+                              <div className="text-white font-bold">{uploadedData.rows.length.toLocaleString()}</div>
+                            </div>
+                            <div>
+                              <div className="text-slate-500 text-[9px] uppercase font-bold">Columns</div>
+                              <div className="text-white font-bold">{uploadedData.headers.length}</div>
+                            </div>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Sandbox Inference Test Block */}
-                  {trainingMetrics.length > 0 && !isTraining && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-4 rounded-xl border border-slate-800 bg-slate-950/50 space-y-4"
-                    >
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wide">Test Trained Model</h4>
-                      <div className="grid grid-cols-3 gap-3 text-xs">
-                        {selectedDataset === "churn" && (
-                          <>
-                            <div>
-                              <label className="text-[10px] text-slate-500">Tenure (Months)</label>
-                              <input 
-                                type="number" value={predictInputs.tenure} 
-                                onChange={e => setPredictInputs({...predictInputs, tenure: Number(e.target.value)})}
-                                className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] text-slate-500">Monthly Cost ($)</label>
-                              <input 
-                                type="number" value={predictInputs.monthly_charges}
-                                onChange={e => setPredictInputs({...predictInputs, monthly_charges: Number(e.target.value)})}
-                                className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1"
-                              />
-                            </div>
-                            <div className="flex items-end">
-                              <button 
-                                onClick={handleRunInference}
-                                className="w-full py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 font-bold text-white text-[10px]"
-                              >
-                                {isPredicting ? "Predicting..." : "Predict"}
-                              </button>
-                            </div>
-                          </>
-                        )}
-                        {selectedDataset === "titanic" && (
-                          <>
-                            <div>
-                              <label className="text-[10px] text-slate-500">Passenger Class (1-3)</label>
-                              <input 
-                                type="number" value={predictInputs.pclass} 
-                                onChange={e => setPredictInputs({...predictInputs, pclass: Number(e.target.value)})}
-                                className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] text-slate-500">Age</label>
-                              <input 
-                                type="number" value={predictInputs.age}
-                                onChange={e => setPredictInputs({...predictInputs, age: Number(e.target.value)})}
-                                className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1"
-                              />
-                            </div>
-                            <div className="flex items-end">
-                              <button 
-                                onClick={handleRunInference}
-                                className="w-full py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 font-bold text-white text-[10px]"
-                              >
-                                {isPredicting ? "Predicting..." : "Predict"}
-                              </button>
-                            </div>
-                          </>
-                        )}
-                        {selectedDataset === "housing" && (
-                          <>
-                            <div>
-                              <label className="text-[10px] text-slate-500">Median Income</label>
-                              <input 
-                                type="number" step="0.1" value={predictInputs.income} 
-                                onChange={e => setPredictInputs({...predictInputs, income: Number(e.target.value)})}
-                                className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1"
-                              />
-                            </div>
-                            <div>
-                              <label className="text-[10px] text-slate-500">House Age</label>
-                              <input 
-                                type="number" value={predictInputs.house_age}
-                                onChange={e => setPredictInputs({...predictInputs, house_age: Number(e.target.value)})}
-                                className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1"
-                              />
-                            </div>
-                            <div className="flex items-end">
-                              <button 
-                                onClick={handleRunInference}
-                                className="w-full py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 font-bold text-white text-[10px]"
-                              >
-                                {isPredicting ? "Predicting..." : "Predict"}
-                              </button>
-                            </div>
-                          </>
-                        )}
                       </div>
+                    )}
 
-                      {/* Prediction response display */}
-                      {predictOutput && (
-                        <motion.div 
-                          initial={{ opacity: 0 }} 
-                          animate={{ opacity: 1 }} 
-                          className="p-3 rounded bg-slate-900 border border-cyan-500/20 text-[11px] font-mono text-cyan-400 flex items-center justify-between"
-                        >
-                          <span>Output Result:</span>
-                          <span className="font-bold">{predictOutput}</span>
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  )}
+                    {playgroundActiveTab === ("live_files" as any) && (
+                      <div className="space-y-4 overflow-y-auto max-h-[300px] scrollbar-thin pr-1 text-xs">
+                        <div className="flex justify-between items-center pb-2 border-b border-slate-900 font-mono">
+                          <span className="text-[10px] text-slate-500">MONITOR PATH: sandbox_files/</span>
+                          <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                            LIVE DAEMON SYNC
+                          </span>
+                        </div>
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="border-b border-slate-900 text-left text-slate-500 font-bold text-[9px] uppercase tracking-wider font-mono">
+                              <th className="pb-2">Filename</th>
+                              <th className="pb-2">Size</th>
+                              <th className="pb-2">Baseline SHA-256</th>
+                              <th className="pb-2">Current SHA-256</th>
+                              <th className="pb-2 text-right">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-900 font-mono text-[10px]">
+                            {liveFiles.map((file: any, fIdx: number) => (
+                              <tr key={fIdx} className="hover:bg-slate-900/30">
+                                <td className="py-2.5 text-white font-bold">{file.filename}</td>
+                                <td className="py-2.5 text-slate-400">{file.size_bytes} B</td>
+                                <td className="py-2.5 text-slate-500">{file.baseline_hash}</td>
+                                <td className="py-2.5 text-slate-400">{file.current_hash}</td>
+                                <td className="py-2.5 text-right">
+                                  <span className={`inline-flex px-2 py-0.5 rounded text-[8px] font-bold ${
+                                    file.status === "SECURE" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
+                                    file.status === "CORRUPTED" ? "bg-red-500/10 text-red-400 border border-red-500/20 animate-pulse" :
+                                    "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                  }`}>
+                                    {file.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                  </div>
                 </div>
+
+                {/* Sandbox Checksum Test Block */}
+                {simMetrics.length > 0 && !isSimulating && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-xl border border-slate-800 bg-slate-950/50 space-y-4"
+                  >
+                    <h4 className="text-xs font-bold text-white uppercase tracking-wide">Test Cryptographic Hash Integrity</h4>
+                    <div className="grid grid-cols-3 gap-3 text-xs">
+                      <div>
+                        <label className="text-[10px] text-slate-500">Target Path</label>
+                        <input 
+                          type="text" value={predictInputs.file_path} 
+                          onChange={e => setPredictInputs({...predictInputs, file_path: e.target.value})}
+                          className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1 font-mono text-[9px]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-500">Current Checksum</label>
+                        <input 
+                          type="text" value={predictInputs.current_checksum}
+                          onChange={e => setPredictInputs({...predictInputs, current_checksum: e.target.value})}
+                          className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1 font-mono text-[9px]"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-slate-500">Expected Checksum</label>
+                        <input 
+                          type="text" value={predictInputs.expected_checksum}
+                          onChange={e => setPredictInputs({...predictInputs, expected_checksum: e.target.value})}
+                          className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1 text-white outline-none mt-1 font-mono text-[9px]"
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={handleRunInference}
+                      className="w-full py-2 rounded bg-red-600 hover:bg-red-500 font-bold text-white text-[10px]"
+                    >
+                      {isPredicting ? "Calculating hashes..." : "Verify Cryptographic Hashes"}
+                    </button>
+
+                    {/* Output display */}
+                    {predictOutput && (
+                      <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        className={`p-3 rounded border text-[11px] font-mono flex items-center justify-between ${
+                          predictOutput.includes("ALERT") 
+                            ? "bg-red-500/10 border-red-500/20 text-red-400" 
+                            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                        }`}
+                      >
+                        <span>Integrity Result:</span>
+                        <span className="font-bold">{predictOutput}</span>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                )}
 
               </div>
             </div>
           )}
 
           {/* ────────────────────────────────────────────────────────
-              SECTION 3: DATA PIPELINES BUILDER 
+              SECTION 3: SYSLOG INGESTION
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "Data Pipelines" && (
+          {activeSection === "Syslog Ingestion" && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <Layers className="w-6 h-6 text-blue-400" />
-                  VISUAL DATA PIPELINES
+                  <Layers className="w-6 h-6 text-red-400" />
+                  SYSLOG INGESTION PIPELINES
                 </h1>
-                <p className="text-slate-400 text-xs mt-1">Simulate visual nodes connector pipelines from source to REST deployment.</p>
+                <p className="text-slate-400 text-xs mt-1">Simulate visual nodes connector pipelines parsing Unix logs and auth syslog streams.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
@@ -1107,14 +1362,14 @@ export default function Platform() {
                   <div className="absolute inset-0 bg-grid-lines pointer-events-none opacity-40" />
 
                   <div className="relative z-10 flex justify-between items-center border-b border-slate-900 pb-3">
-                    <h3 className="text-white font-bold text-sm">Orchestration Canvas</h3>
+                    <h3 className="text-white font-bold text-sm">System Ingestion Canvas</h3>
                     <button 
                       onClick={handleRunPipeline}
                       disabled={isPipelineRunning}
-                      className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all shadow-lg shadow-blue-500/10 flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition-all shadow-lg shadow-red-500/10 flex items-center gap-1.5"
                     >
                       <Play className="w-3.5 h-3.5 fill-current" />
-                      Run Pipeline
+                      Run Ingest
                     </button>
                   </div>
 
@@ -1127,11 +1382,11 @@ export default function Platform() {
                       className={`p-4 rounded-xl border flex flex-col items-center text-center cursor-pointer transition-all w-28 md:w-32 hover:scale-105 ${
                         pipelineStep === 2 ? "border-yellow-500 bg-yellow-500/10 animate-pulse" :
                         pipelineStep > 2 ? "border-emerald-500 bg-emerald-500/10" :
-                        selectedPipelineNode === "s3" ? "border-blue-500 bg-blue-500/10" : "border-slate-800 bg-slate-950/60"
+                        selectedPipelineNode === "s3" ? "border-red-500 bg-red-500/10" : "border-slate-800 bg-slate-950/60"
                       }`}
                     >
-                      <DatabaseZap className="w-8 h-8 text-blue-400 mb-2" />
-                      <span className="text-[10px] font-bold text-white">AWS S3 Ingest</span>
+                      <DatabaseZap className="w-8 h-8 text-red-400 mb-2" />
+                      <span className="text-[10px] font-bold text-white">Syslog Ingest</span>
                       <span className="text-[8px] text-slate-500 mt-1">Node #1</span>
                     </div>
 
@@ -1144,11 +1399,11 @@ export default function Platform() {
                       className={`p-4 rounded-xl border flex flex-col items-center text-center cursor-pointer transition-all w-28 md:w-32 hover:scale-105 ${
                         pipelineStep === 3 ? "border-yellow-500 bg-yellow-500/10 animate-pulse" :
                         pipelineStep > 3 ? "border-emerald-500 bg-emerald-500/10" :
-                        selectedPipelineNode === "preprocess" ? "border-blue-500 bg-blue-500/10" : "border-slate-800 bg-slate-950/60"
+                        selectedPipelineNode === "preprocess" ? "border-red-500 bg-red-500/10" : "border-slate-800 bg-slate-950/60"
                       }`}
                     >
-                      <Sliders className="w-8 h-8 text-cyan-400 mb-2" />
-                      <span className="text-[10px] font-bold text-white">Scaler & Preprocess</span>
+                      <Sliders className="w-8 h-8 text-orange-400 mb-2" />
+                      <span className="text-[10px] font-bold text-white">Log Parser</span>
                       <span className="text-[8px] text-slate-500 mt-1">Node #2</span>
                     </div>
 
@@ -1161,11 +1416,11 @@ export default function Platform() {
                       className={`p-4 rounded-xl border flex flex-col items-center text-center cursor-pointer transition-all w-28 md:w-32 hover:scale-105 ${
                         pipelineStep === 4 || pipelineStep === 5 ? "border-yellow-500 bg-yellow-500/10 animate-pulse" :
                         pipelineStep > 5 ? "border-emerald-500 bg-emerald-500/10" :
-                        selectedPipelineNode === "train" ? "border-blue-500 bg-blue-500/10" : "border-slate-800 bg-slate-950/60"
+                        selectedPipelineNode === "train" ? "border-red-500 bg-red-500/10" : "border-slate-800 bg-slate-950/60"
                       }`}
                     >
-                      <Brain className="w-8 h-8 text-indigo-400 mb-2" />
-                      <span className="text-[10px] font-bold text-white">XGBoost Train</span>
+                      <Brain className="w-8 h-8 text-yellow-400 mb-2" />
+                      <span className="text-[10px] font-bold text-white">Anomaly Scanner</span>
                       <span className="text-[8px] text-slate-500 mt-1">Node #3</span>
                     </div>
 
@@ -1177,11 +1432,11 @@ export default function Platform() {
                       onClick={() => setSelectedPipelineNode("deploy")}
                       className={`p-4 rounded-xl border flex flex-col items-center text-center cursor-pointer transition-all w-28 md:w-32 hover:scale-105 ${
                         pipelineStep === 6 ? "border-emerald-500 bg-emerald-500/10 shadow shadow-emerald-500/20" :
-                        selectedPipelineNode === "deploy" ? "border-blue-500 bg-blue-500/10" : "border-slate-800 bg-slate-950/60"
+                        selectedPipelineNode === "deploy" ? "border-red-500 bg-red-500/10" : "border-slate-800 bg-slate-950/60"
                       }`}
                     >
                       <Globe className="w-8 h-8 text-emerald-400 mb-2" />
-                      <span className="text-[10px] font-bold text-white">REST Deploy</span>
+                      <span className="text-[10px] font-bold text-white">Alert Webhook</span>
                       <span className="text-[8px] text-slate-500 mt-1">Node #4</span>
                     </div>
 
@@ -1190,12 +1445,12 @@ export default function Platform() {
                   {/* Active node descriptor */}
                   <div className="relative z-10 p-4 rounded-xl bg-slate-950/80 border border-slate-900 text-xs">
                     <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Canvas Node Configurator</span>
-                    <div className="mt-2 text-slate-300">
-                      {selectedPipelineNode === "s3" && "AWS S3 Node: Set credentials, bucket path (e.g. s3://novamind-revenue), and ingestion sync rate."}
-                      {selectedPipelineNode === "preprocess" && "Scaler Node: Configure imputer (Median), standard scaling bounds, and drop columns parameters."}
-                      {selectedPipelineNode === "train" && "Train Node: Sweeps grid bounds (xgboost), 5-fold cross-validation, and metrics target evaluation."}
-                      {selectedPipelineNode === "deploy" && "Deploy Node: Select endpoint path (novamind-cloud.api/v1/s3-revenue), set API rate limits, and sync tokens."}
-                      {!selectedPipelineNode && "Click on any node above to verify or configure its infrastructure parameters."}
+                    <div className="mt-2 text-slate-300 font-mono text-[11px]">
+                      {selectedPipelineNode === "s3" && "Syslog Node: Set log directory targets, parse filters (auth, errors, warnings), and sync ingestion frequency."}
+                      {selectedPipelineNode === "preprocess" && "Log Parser Node: Apply regex filters, auto-extract variables (IP address, PID, error code), and decode messages."}
+                      {selectedPipelineNode === "train" && "Anomaly Scanner Node: Fits real-time log records to heuristic checksum detectors."}
+                      {selectedPipelineNode === "deploy" && "Alert Webhook Node: Deploy JSON webhook dispatches to alert channels (Slack/PagerDuty) on error limits."}
+                      {!selectedPipelineNode && "Click on any node above to verify or configure its system parameters."}
                     </div>
                   </div>
                 </div>
@@ -1204,34 +1459,34 @@ export default function Platform() {
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl flex flex-col justify-between min-h-[460px]">
                   <div className="border-b border-slate-900 pb-3 flex items-center justify-between">
                     <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                      <Terminal className="w-4 h-4 text-blue-400" />
-                      Terminal Output
+                      <Terminal className="w-4 h-4 text-red-500" />
+                      Live syslog streams
                     </h3>
                   </div>
 
                   <div className="flex-1 bg-slate-950/80 p-4 border border-slate-900/50 rounded-xl my-4 font-mono text-[10px] space-y-2 overflow-y-auto text-slate-300">
                     {pipelineLogs.length === 0 ? (
-                      <span className="text-slate-600">&gt; Waiting for pipeline execute trigger...</span>
+                      <span className="text-slate-600">&gt; Awaiting pipeline execute trigger...</span>
                     ) : (
                       pipelineLogs.map((log, idx) => (
                         <div key={idx} className="flex gap-2">
-                          <span className="text-blue-500">[{idx+1}]</span>
-                          <span className={log.includes("anomaly") ? "text-rose-400" : log.includes("finalized") || log.includes("SUCCESS") ? "text-emerald-400" : "text-slate-300"}>
+                          <span className="text-red-500">[{idx+1}]</span>
+                          <span className={log.includes("SLA") || log.includes("finalized") || log.includes("SUCCESS") || log.includes("Endpoint") ? "text-emerald-400" : "text-slate-300"}>
                             {log}
                           </span>
                         </div>
                       ))
                     )}
                     {isPipelineRunning && (
-                      <div className="flex items-center gap-2 text-blue-400 animate-pulse mt-4">
+                      <div className="flex items-center gap-2 text-red-400 animate-pulse mt-4">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>PROCESSING ACTIVE STAGE...</span>
+                        <span>SCANNING LOG METADATA...</span>
                       </div>
                     )}
                   </div>
 
                   <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 text-[10px] text-slate-500">
-                    Pipelines automate ETL extraction. On success, weights are saved and endpoints are mapped.
+                    Syslog pipelines auto-parse Unix event logs. Webhooks trigger incident pages on error matches.
                   </div>
                 </div>
 
@@ -1242,14 +1497,14 @@ export default function Platform() {
           {/* ────────────────────────────────────────────────────────
               SECTION 4: AI COPILOT CHATROOM
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "AI Copilot" && (
+          {activeSection === "Incident Response Copilot" && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <MessageSquare className="w-6 h-6 text-blue-400" />
-                  ANALYTICS AI COPILOT
+                  <MessageSquare className="w-6 h-6 text-red-400" />
+                  INCIDENT RESPONSE COPILOT
                 </h1>
-                <p className="text-slate-400 text-xs mt-1">Ask questions or sweep campaigns. The AI outputs live interactive dashboards.</p>
+                <p className="text-slate-400 text-xs mt-1">Ask questions about checksum logs, data corruption events, or how to isolate broken servers.</p>
               </div>
 
               {/* Chat panel */}
@@ -1265,7 +1520,7 @@ export default function Platform() {
                       }`}
                     >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                        chat.sender === "user" ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/10" : "bg-blue-600/20 text-blue-400 border border-blue-500/10"
+                        chat.sender === "user" ? "bg-orange-500/20 text-orange-400 border border-orange-500/10" : "bg-red-600/20 text-red-400 border border-red-500/10"
                       }`}>
                         {chat.sender === "user" ? "U" : "AI"}
                       </div>
@@ -1279,7 +1534,7 @@ export default function Platform() {
                           {chat.text}
                         </div>
 
-                        {/* Inline Recharts Widget inside Chat ( recruiter wow-factor ) */}
+                        {/* Inline Recharts Widget inside Chat */}
                         {chat.chartData && (
                           <motion.div 
                             initial={{ opacity: 0, scale: 0.98 }}
@@ -1293,7 +1548,7 @@ export default function Platform() {
                                   <XAxis dataKey="name" stroke="#64748b" />
                                   <YAxis stroke="#64748b" />
                                   <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                                  <Bar dataKey="Conversion" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                  <Bar dataKey="Conversion" name="Incidents Count" fill="#ef4444" radius={[4, 4, 0, 0]} />
                                 </BarChart>
                               ) : chat.chartType === "line" ? (
                                 <LineChart data={chat.chartData}>
@@ -1301,21 +1556,21 @@ export default function Platform() {
                                   <XAxis dataKey="time" stroke="#64748b" />
                                   <YAxis stroke="#64748b" />
                                   <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                                  <Line type="monotone" dataKey="Latency" stroke="#f43f5e" strokeWidth={2} />
+                                  <Line type="monotone" dataKey="Latency" name="Scan Latency (ms)" stroke="#fb923c" strokeWidth={2} />
                                 </LineChart>
                               ) : (
                                 <AreaChart data={chat.chartData}>
                                   <defs>
                                     <linearGradient id="chartRev" x1="0" y1="0" x2="0" y2="1">
-                                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
-                                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
                                     </linearGradient>
                                   </defs>
                                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.01)" />
                                   <XAxis dataKey="month" stroke="#64748b" />
                                   <YAxis stroke="#64748b" />
                                   <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
-                                  <Area type="monotone" dataKey="Revenue" stroke="#06b6d4" fill="url(#chartRev)" strokeWidth={2} />
+                                  <Area type="monotone" dataKey="Revenue" name="Integrity score (%)" stroke="#f43f5e" fill="url(#chartRev)" strokeWidth={2} />
                                 </AreaChart>
                               )}
                             </ResponsiveContainer>
@@ -1327,12 +1582,12 @@ export default function Platform() {
 
                   {isAiTyping && (
                     <div className="flex gap-3 max-w-[80%]">
-                      <div className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/10 flex items-center justify-center text-sm font-bold">
+                      <div className="w-8 h-8 rounded-lg bg-red-600/20 text-red-400 border border-red-500/10 flex items-center justify-center text-sm font-bold">
                         AI
                       </div>
                       <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-900 text-slate-500 text-xs flex items-center gap-1.5 rounded-tl-none">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>NovaMind Copilot is fetching database metrics...</span>
+                        <span>Nova AI Copilot is querying active directory structures...</span>
                       </div>
                     </div>
                   )}
@@ -1342,10 +1597,9 @@ export default function Platform() {
                 {/* Prebuilt Prompts Chips */}
                 <div className="flex flex-wrap gap-2 py-3 border-t border-slate-900">
                   {[
-                    "Analyze marketing spend vs conversion rates",
-                    "Find pipeline latency outliers",
-                    "Explain XGBoost feature weights",
-                    "Draft Q3 revenue report"
+                    "Show active server data corruption logs",
+                    "Check system check-sum latency spikes",
+                    "Draft server quarantine shell script"
                   ].map(chip => (
                     <button
                       key={chip}
@@ -1364,12 +1618,12 @@ export default function Platform() {
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleSendMessage()}
-                    placeholder="Ask Copilot about S3 latency, parameters weights, or forecast data..."
-                    className="flex-1 bg-slate-950 border border-slate-900 rounded-xl px-4 py-3 text-slate-300 text-xs outline-none focus:border-blue-500/60 transition-all"
+                    placeholder="Ask Copilot about filesystem logs, checksum status, or incident mitigations..."
+                    className="flex-1 bg-slate-950 border border-slate-900 rounded-xl px-4 py-3 text-slate-300 text-xs outline-none focus:border-red-500/60 transition-all"
                   />
                   <button
                     onClick={() => handleSendMessage()}
-                    className="p-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-all shadow"
+                    className="p-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-all shadow"
                   >
                     <Send className="w-4 h-4" />
                   </button>
@@ -1380,21 +1634,21 @@ export default function Platform() {
           )}
 
           {/* ────────────────────────────────────────────────────────
-              SECTION 5: TIME-SERIES FORECASTING
+              SECTION 5: INCIDENT FORECASTING
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "Forecasting" && (
+          {activeSection === "Incident Forecasting" && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <TrendingUp className="w-6 h-6 text-blue-400" />
-                  TIME-SERIES FORECASTING
+                  <TrendingUp className="w-6 h-6 text-red-400" />
+                  INCIDENT & OUTAGE FORECASTING
                 </h1>
-                <p className="text-slate-400 text-xs mt-1">Select metric models and render confidence interval trends dynamically.</p>
+                <p className="text-slate-400 text-xs mt-1">Select metric models and render warning spikes or hardware failure forecasts.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                 
-                {/* Forecasting hyperparameter panel */}
+                {/* Forecasting controls */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl space-y-6">
                   <div>
                     <h3 className="text-white font-bold text-sm mb-1">Forecast Controls</h3>
@@ -1412,14 +1666,14 @@ export default function Platform() {
                         }}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 outline-none"
                       >
-                        <option value="mrr">Monthly Recurring Revenue (MRR)</option>
-                        <option value="users">Monthly Active Users (MAU)</option>
-                        <option value="traffic">API Request Ingestion Traffic</option>
+                        <option value="incidents">Data Corruption Incidents Count</option>
+                        <option value="users">System Integrity Score (%)</option>
+                        <option value="traffic">Alert Webhook Volume (requests/hr)</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="block text-slate-400 font-medium mb-1.5">Model Horizon</label>
+                      <label className="block text-slate-400 font-medium mb-1.5">Forecast Horizon</label>
                       <select 
                         value={forecastHorizon}
                         onChange={e => {
@@ -1444,9 +1698,9 @@ export default function Platform() {
                         }}
                         className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 outline-none"
                       >
-                        <option value="prophet">Facebook Prophet (Additive Model)</option>
-                        <option value="arima">ARIMA Auto-Regressive Integrated</option>
-                        <option value="lstm">LSTM recurrent network (Neural)</option>
+                        <option value="prophet">Facebook Prophet (Additive Curve)</option>
+                        <option value="arima">ARIMA Auto-Regressive Drift</option>
+                        <option value="lstm">LSTM Neural Network</option>
                       </select>
                     </div>
                   </div>
@@ -1454,7 +1708,7 @@ export default function Platform() {
                   <button
                     onClick={handleGenerateForecast}
                     disabled={isForecasting}
-                    className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/10 transition-all flex items-center justify-center gap-2"
                   >
                     {isForecasting ? (
                       <>
@@ -1491,8 +1745,8 @@ export default function Platform() {
                           <AreaChart data={forecastResult}>
                             <defs>
                               <linearGradient id="forecastBand" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.15}/>
-                                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.02}/>
+                                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.15}/>
+                                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.02}/>
                               </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.01)" />
@@ -1500,11 +1754,8 @@ export default function Platform() {
                             <YAxis stroke="#64748b" />
                             <Tooltip contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155" }} />
                             <Legend />
-                            {/* historical line */}
-                            <Line type="monotone" dataKey="Historical" name="Historical Actual" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 4 }} />
-                            {/* forecast line */}
-                            <Line type="monotone" dataKey="Forecast" name="Model Forecast" stroke="#06b6d4" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} />
-                            {/* confidence upper/lower area */}
+                            <Line type="monotone" dataKey="Historical" name="Historical Actual" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 4 }} />
+                            <Line type="monotone" dataKey="Forecast" name="Model Forecast" stroke="#f97316" strokeDasharray="5 5" strokeWidth={2.5} dot={{ r: 4 }} />
                             <Area type="monotone" dataKey="Upper" stroke="none" fill="url(#forecastBand)" legendType="none" />
                             <Area type="monotone" dataKey="Lower" stroke="none" fill="url(#forecastBand)" legendType="none" />
                           </AreaChart>
@@ -1514,23 +1765,23 @@ export default function Platform() {
                       {/* Forecast stats card */}
                       <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-900 text-center">
                         <div className="p-3 rounded-lg bg-slate-950 border border-slate-900">
-                          <div className="text-[9px] text-slate-500 uppercase font-bold">MAE Score</div>
-                          <div className="text-sm font-bold text-white mt-1">2.41%</div>
+                          <div className="text-[9px] text-slate-500 uppercase font-bold">MAE Drift</div>
+                          <div className="text-sm font-bold text-white mt-1">2.12%</div>
                         </div>
                         <div className="p-3 rounded-lg bg-slate-950 border border-slate-900">
-                          <div className="text-[9px] text-slate-500 uppercase font-bold">RMSE Bound</div>
-                          <div className="text-sm font-bold text-white mt-1">1.82k</div>
+                          <div className="text-[9px] text-slate-500 uppercase font-bold">RMSE Margin</div>
+                          <div className="text-sm font-bold text-white mt-1">1.42</div>
                         </div>
                         <div className="p-3 rounded-lg bg-slate-950 border border-slate-900">
-                          <div className="text-[9px] text-slate-500 uppercase font-bold">MAPE Accuracy</div>
-                          <div className="text-sm font-bold text-emerald-400 mt-1">97.8%</div>
+                          <div className="text-[9px] text-slate-500 uppercase font-bold">Fit Accuracy</div>
+                          <div className="text-sm font-bold text-emerald-400 mt-1">98.4%</div>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 text-[10px] text-slate-500">
-                    Forecasting fits additive model algorithms. Confidence bounds expand as horizons lengthen.
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 text-[10px] text-slate-500 font-mono">
+                    projections fit additive ARIMA parameters. Incident thresholds expand as horizons lengthen.
                   </div>
                 </div>
 
@@ -1539,16 +1790,16 @@ export default function Platform() {
           )}
 
           {/* ────────────────────────────────────────────────────────
-              SECTION 6: API DEPLOYMENTS / LIVE REGISTRY
+              SECTION 6: CONTAINMENT WEBHOOKS (API TESTING)
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "API Deployments" && (
+          {activeSection === "Containment Webhooks" && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <Activity className="w-6 h-6 text-blue-400" />
-                  API ENDPOINTS HUB
+                  <Activity className="w-6 h-6 text-red-400" />
+                  CONTAINMENT WEBHOOKS
                 </h1>
-                <p className="text-slate-400 text-xs mt-1">Test active REST model payloads and check infrastructure latencies.</p>
+                <p className="text-slate-400 text-xs mt-1">Test active incident containment webhooks and verify payload dispatches.</p>
               </div>
 
               {/* Endpoint list */}
@@ -1557,32 +1808,32 @@ export default function Platform() {
                 {/* Registry panel */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl space-y-6">
                   <div>
-                    <h3 className="text-white font-bold text-sm mb-1">Endpoint Registry</h3>
-                    <p className="text-slate-500 text-[10px]">Select deployed API to test request response</p>
+                    <h3 className="text-white font-bold text-sm mb-1">Containment Registry</h3>
+                    <p className="text-slate-500 text-[10px]">Select active webhook to test server response</p>
                   </div>
 
                   <div className="space-y-3">
                     {[
-                      { name: "telecom-churn-predictor", model: "XGBoost", status: "ONLINE", rate: "4.8k req/min", path: "/api/v1/churn" },
-                      { name: "titanic-survival-mlp", model: "Deep Neural MLP", status: "ONLINE", rate: "1.2k req/min", path: "/api/v1/titanic" },
-                      { name: "housing-value-rf", model: "RandomForest", status: "ONLINE", rate: "820 req/min", path: "/api/v1/housing" }
+                      { name: "server-quarantine-webhook", model: "WAF isolation rule", status: "ONLINE", rate: "4.2 dispatches/min", path: "/api/v1/quarantine" },
+                      { name: "database-rollback-trigger", model: "Automated state rollback", status: "ONLINE", rate: "1.2 dispatches/min", path: "/api/v1/rollback" },
+                      { name: "pagerduty-incident-alert", model: "PagerDuty Pager Trigger", status: "ONLINE", rate: "820 dispatches/min", path: "/api/v1/pagerduty" }
                     ].map(endpoint => (
                       <div 
                         key={endpoint.name}
                         onClick={() => {
                           setApiTesterEndpoint(endpoint.name);
-                          if (endpoint.name === "telecom-churn-predictor") {
-                            setApiTesterInput(`{\n  "tenure": 12,\n  "monthly_charges": 65.80,\n  "total_charges": 789.60,\n  "contract_type": "One year"\n}`);
-                          } else if (endpoint.name === "titanic-survival-mlp") {
-                            setApiTesterInput(`{\n  "age": 28,\n  "fare": 32.50,\n  "pclass": 1,\n  "sex": "female"\n}`);
+                          if (endpoint.name === "server-quarantine-webhook") {
+                            setApiTesterInput(`{\n  "target_node": "Server-East-04",\n  "incident_id": "err_f839a2d",\n  "quarantine_network": "10.0.4.0/24",\n  "containment_level": "critical"\n}`);
+                          } else if (endpoint.name === "database-rollback-trigger") {
+                            setApiTesterInput(`{\n  "db_pool": "MySQL-Pool-01",\n  "target_timestamp": "${new Date(Date.now() - 3600000).toISOString()}",\n  "rollback_checksum": "cf82d0"\n}`);
                           } else {
-                            setApiTesterInput(`{\n  "income": 5.5,\n  "house_age": 15,\n  "rooms": 6,\n  "population": 840\n}`);
+                            setApiTesterInput(`{\n  "service_key": "pd_active_keys",\n  "alert_summary": "Critical: Directory /var/lib/mysql integrity check failed!",\n  "severity": "CRITICAL"\n}`);
                           }
                           setApiTesterOutput("");
                         }}
                         className={`p-4 rounded-xl border cursor-pointer transition-all ${
                           apiTesterEndpoint === endpoint.name 
-                            ? "border-blue-500 bg-blue-500/5" 
+                            ? "border-red-500 bg-red-500/5" 
                             : "border-slate-800 hover:border-slate-700 bg-slate-950/60"
                         }`}
                       >
@@ -1606,8 +1857,8 @@ export default function Platform() {
                   <div className="flex justify-between items-center border-b border-slate-900 pb-3">
                     <h3 className="text-white font-bold text-sm">HTTP Request Poster</h3>
                     <div className="flex items-center gap-2 font-mono text-[10px] text-slate-500 bg-slate-950 px-3 py-1 rounded border border-slate-900">
-                      <span className="text-blue-400 font-bold">POST</span>
-                      <span>novamind-cloud.api/v1/{apiTesterEndpoint}</span>
+                      <span className="text-red-400 font-bold">POST</span>
+                      <span>novaalert.api/v1/{apiTesterEndpoint}</span>
                     </div>
                   </div>
 
@@ -1620,7 +1871,7 @@ export default function Platform() {
                       <textarea
                         value={apiTesterInput}
                         onChange={e => setApiTesterInput(e.target.value)}
-                        className="w-full h-48 bg-slate-950 border border-slate-900 rounded-xl p-3 font-mono text-[10px] text-slate-300 outline-none resize-none focus:border-blue-500/60"
+                        className="w-full h-48 bg-slate-950 border border-slate-900 rounded-xl p-3 font-mono text-[10px] text-slate-300 outline-none resize-none focus:border-red-500/60"
                       />
                     </div>
 
@@ -1628,10 +1879,10 @@ export default function Platform() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <label className="block text-slate-400 text-xs font-medium">JSON Response Payload</label>
-                        {isApiTesting && <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" />}
+                        {isApiTesting && <Loader2 className="w-3.5 h-3.5 text-red-500 animate-spin" />}
                       </div>
                       <div className="w-full h-48 bg-slate-950 border border-slate-900 rounded-xl p-3 font-mono text-[10px] text-slate-400 overflow-y-auto whitespace-pre">
-                        {apiTesterOutput || "{\n  // Click send query to view live infrastructure outputs\n}"}
+                        {apiTesterOutput || "{\n  // Click trigger below to verify automated containment responses\n}"}
                       </div>
                     </div>
 
@@ -1640,9 +1891,9 @@ export default function Platform() {
                   <button
                     onClick={handleTestApi}
                     disabled={isApiTesting}
-                    className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/10 flex items-center justify-center gap-2"
                   >
-                    {isApiTesting ? "Awaiting Network Ingest..." : "Send Inference Request"}
+                    {isApiTesting ? "Awaiting network dispatch..." : "Trigger Containment Action"}
                   </button>
                 </div>
 
@@ -1653,23 +1904,23 @@ export default function Platform() {
           {/* ────────────────────────────────────────────────────────
               SECTION 7: SETTINGS PANEL
               ──────────────────────────────────────────────────────── */}
-          {activeSection === "Settings" && (
+          {activeSection === "Workspace Settings" && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-black text-white flex items-center gap-2">
-                  <SettingsIcon className="w-6 h-6 text-blue-400" />
+                  <SettingsIcon className="w-6 h-6 text-red-400" />
                   WORKSPACE SETTINGS
                 </h1>
-                <p className="text-slate-400 text-xs mt-1">Configure client-side subscription profiles, API keys, and rate limits.</p>
+                <p className="text-slate-400 text-xs mt-1">Configure workspace credentials, webhook integrations, and scan limits.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {/* Security and Credentials settings */}
+                {/* Security settings */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl space-y-6">
                   <div>
                     <h3 className="text-white font-bold text-sm mb-1">API Key Provisioning</h3>
-                    <p className="text-slate-500 text-[10px]">Create secure access credentials for API hubs</p>
+                    <p className="text-slate-500 text-[10px]">Create secure access credentials for external syslog streams</p>
                   </div>
 
                   <div className="space-y-4 text-xs">
@@ -1682,7 +1933,7 @@ export default function Platform() {
                         </div>
                         <button
                           onClick={handleGenerateApiKey}
-                          className="px-4 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all text-xs"
+                          className="px-4 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold transition-all text-xs"
                         >
                           Generate New
                         </button>
@@ -1704,34 +1955,34 @@ export default function Platform() {
 
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
-                        <label className="text-slate-400 font-medium">Simulated Rate Limit Bounds</label>
-                        <span className="text-blue-400 font-bold font-mono">{rateLimit.toLocaleString()} req/hr</span>
+                        <label className="text-slate-400 font-medium">Hourly Scan Limit</label>
+                        <span className="text-red-400 font-bold font-mono">{rateLimit.toLocaleString()} scans/hr</span>
                       </div>
                       <input 
                         type="range" min="1000" max="25000" step="500" value={rateLimit} 
                         onChange={e => setRateLimit(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-blue-500" 
+                        className="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-red-500" 
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Subscriptions & Accounts details */}
+                {/* Subscriptions */}
                 <div className="p-6 rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-xl space-y-6">
                   <div>
-                    <h3 className="text-white font-bold text-sm mb-1">Billing & Workspace Profile</h3>
-                    <p className="text-slate-500 text-[10px]">Manage compute tiers and workspace access</p>
+                    <h3 className="text-white font-bold text-sm mb-1">Billing & Team Profile</h3>
+                    <p className="text-slate-500 text-[10px]">Manage compute tiers and team access credentials</p>
                   </div>
 
                   <div className="space-y-4 text-xs">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-3.5 rounded-xl border border-slate-900 bg-slate-950/60">
                         <div className="text-[9px] text-slate-500 uppercase font-bold">ACTIVE TIER</div>
-                        <div className="text-sm font-black text-white mt-1">Pro Developer</div>
+                        <div className="text-sm font-black text-white mt-1">Sentinel Professional</div>
                       </div>
                       <div className="p-3.5 rounded-xl border border-slate-900 bg-slate-950/60">
-                        <div className="text-[9px] text-slate-500 uppercase font-bold">ESTIMATED GPU</div>
-                        <div className="text-sm font-black text-white mt-1">Shared T4 Engine</div>
+                        <div className="text-[9px] text-slate-500 uppercase font-bold">INTEGRATED WEBHOOKS</div>
+                        <div className="text-sm font-black text-white mt-1">Slack & PagerDuty</div>
                       </div>
                     </div>
 
@@ -1745,8 +1996,8 @@ export default function Platform() {
                       />
                     </div>
                     
-                    <div className="p-3.5 rounded-xl border border-blue-500/20 bg-blue-500/5 text-[10px] text-slate-400 leading-relaxed">
-                      💡 <strong>Recruiter Notice:</strong> The simulated parameters, logs, charts, and API testers are pre-integrated into this sandboxed Next.js app to display advanced interactive logic and design architecture on a single, deployable codebase.
+                    <div className="p-3.5 rounded-xl border border-red-500/20 bg-red-500/5 text-[10px] text-slate-400 leading-relaxed font-mono">
+                      💡 Recruiter Notice: The simulated parameters, logs, charts, and API testers are pre-integrated into this sandboxed Next.js app to display advanced interactive logic and design architecture on a single, deployable codebase.
                     </div>
                   </div>
                 </div>

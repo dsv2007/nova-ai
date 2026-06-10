@@ -19,12 +19,10 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">N</span>
-          </div>
-          <span className="text-white font-bold text-xl">
-            Nova<span className="text-blue-400">Mind</span>
-          </span>
+<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 via-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-red-500/30"><span className="text-white font-bold text-sm">NA</span>          </div>
+         <span className="text-white font-bold text-xl tracking-tight">
+  Nova AI
+</span>
         </Link>
 
         {/* Desktop Nav */}

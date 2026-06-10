@@ -18,7 +18,7 @@ export default function Contact() {
     lastName: "",
     email: "",
     company: "",
-    interest: "AI & Machine Learning",
+    interest: "System Corruption Alerts",
     message: ""
   });
   
@@ -40,7 +40,7 @@ export default function Contact() {
       lastName: "",
       email: "",
       company: "",
-      interest: "AI & Machine Learning",
+      interest: "System Corruption Alerts",
       message: ""
     });
     setFormStatus("idle");
@@ -50,24 +50,24 @@ export default function Contact() {
     <main className="min-h-screen bg-slate-950 bg-grid-dots pt-24 pb-20 relative overflow-hidden">
       
       {/* Background glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-600/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-orange-600/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-400 text-xs font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/5 text-red-400 text-xs font-semibold mb-6">
             <span>Get in Touch</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight">
-            Let's Collaborate On
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400 block md:inline md:ml-3">
-              Your Next Pipeline
+            Let&apos;s Secure
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-400 block md:inline md:ml-3">
+              Your Infrastructure
             </span>
           </h1>
           <p className="text-slate-400 text-base md:text-lg leading-relaxed">
-            Have questions about model orchestration, cloud integration, or looking to schedule a design demonstration? We reply within 24 hours.
+            Have questions about syslog scanning, corruption detection thresholds, or looking to schedule a custom dashboard demonstration? We reply within 24 hours.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function Contact() {
                   className="space-y-5"
                 >
                   <h2 className="text-white font-bold text-xl mb-6 flex items-center gap-2">
-                    <Send className="w-5 h-5 text-blue-400" />
+                    <Send className="w-5 h-5 text-red-400" />
                     Submit a Project Inquiry
                   </h2>
                   
@@ -99,7 +99,7 @@ export default function Contact() {
                         value={formData.firstName}
                         onChange={e => setFormData({...formData, firstName: e.target.value})}
                         placeholder="John" 
-                        className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-red-500 transition-colors"
                       />
                     </div>
                     <div>
@@ -110,7 +110,7 @@ export default function Contact() {
                         value={formData.lastName}
                         onChange={e => setFormData({...formData, lastName: e.target.value})}
                         placeholder="Doe" 
-                        className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-red-500 transition-colors"
                       />
                     </div>
                   </div>
@@ -123,33 +123,33 @@ export default function Contact() {
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
                       placeholder="john@company.com" 
-                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-blue-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-red-500 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 text-xs font-medium mb-1.5">Company Name</label>
+                    <label className="block text-slate-400 text-xs font-medium mb-1.5">Company / System Name</label>
                     <input 
                       required 
                       type="text" 
                       value={formData.company}
                       onChange={e => setFormData({...formData, company: e.target.value})}
-                      placeholder="Acme MLOps" 
-                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-blue-500 transition-colors"
+                      placeholder="Acme Cloud" 
+                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-red-500 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 text-xs font-medium mb-1.5">Pipeline Area of Interest</label>
+                    <label className="block text-slate-400 text-xs font-medium mb-1.5">Nova AI Interest Area</label>
                     <select 
                       value={formData.interest}
                       onChange={e => setFormData({...formData, interest: e.target.value})}
-                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-400 text-xs outline-none focus:border-blue-500 transition-colors"
+                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-400 text-xs outline-none focus:border-red-500 transition-colors"
                     >
-                      <option>AI & Machine Learning</option>
-                      <option>Cloud Analytics</option>
-                      <option>Business Intelligence</option>
-                      <option>General Infrastructure Inquiry</option>
+                      <option>System Corruption Alerts</option>
+                      <option>File Integrity Sandbox</option>
+                      <option>Custom Syslog Ingestion</option>
+                      <option>Enterprise Compliance SLA</option>
                     </select>
                   </div>
 
@@ -160,8 +160,8 @@ export default function Contact() {
                       rows={4}
                       value={formData.message}
                       onChange={e => setFormData({...formData, message: e.target.value})}
-                      placeholder="Describe your dataset, training latency constraints, or timeline..." 
-                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-blue-500 transition-colors resize-none"
+                      placeholder="Describe your storage layout, directory sizing, or system corruption concerns..." 
+                      className="w-full bg-slate-950 border border-slate-800/80 rounded-lg px-4 py-2.5 text-slate-300 text-xs outline-none focus:border-red-500 transition-colors resize-none"
                     />
                   </div>
 
@@ -183,9 +183,9 @@ export default function Contact() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="flex flex-col items-center justify-center text-center space-y-4 font-mono text-xs"
                 >
-                  <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-                  <p className="text-slate-300 font-bold">TRANSMITTING SECURE DATA...</p>
-                  <p className="text-slate-500">Routing payload through secure pipeline endpoint</p>
+                  <Loader2 className="w-10 h-10 text-red-500 animate-spin" />
+                  <p className="text-slate-300 font-bold">TRANSMITTING ENCRYPTED PAYLOAD...</p>
+                  <p className="text-slate-500">Routing alert metadata through secure monitoring gateway</p>
                 </motion.div>
               )}
 
@@ -226,7 +226,7 @@ export default function Contact() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="p-6 rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-transparent backdrop-blur-xl relative overflow-hidden"
+              className="p-6 rounded-2xl border border-red-500/20 bg-gradient-to-br from-red-500/10 to-transparent backdrop-blur-xl relative overflow-hidden"
             >
               <div className="absolute top-3 right-3">
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold uppercase tracking-wider font-mono">
@@ -235,24 +235,24 @@ export default function Contact() {
               </div>
 
               <div className="flex gap-4 items-center mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-blue-500/10">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 via-orange-500 to-amber-500 flex items-center justify-center text-2xl font-bold text-white shadow-lg shadow-red-500/10">
                   SD
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold font-mono">Lead Architect</span>
                   <h3 className="text-white font-extrabold text-xl">Santhivarshini D</h3>
-                  <p className="text-blue-400 text-xs font-semibold">Full Stack & MLOps Developer</p>
+                  <p className="text-red-400 text-xs font-semibold">Systems & Full Stack Developer</p>
                 </div>
               </div>
 
               <div className="space-y-4 text-xs">
                 <p className="text-slate-400 leading-relaxed">
-                  Specialized in building high-availability data pipelines, React 19 workflows, and client-side visualization playfields for analytics intelligence.
+                  Specialized in building high-performance syslog anomaly detection engines, React 19 real-time incident dashboards, and automated quarantine webhooks for cloud integrity.
                 </p>
 
                 {/* Tech Stack Tags */}
                 <div className="flex flex-wrap gap-1.5 py-2">
-                  {["Next.js 16", "React 19", "TypeScript", "Tailwind CSS", "Framer Motion", "Recharts", "FastAPI / Python", "Data Engineering"].map(tag => (
+                  {["Next.js 16", "React 19", "TypeScript", "Tailwind CSS", "Framer Motion", "Recharts", "Go / Rust", "Syslog Parsing", "Data Integrity"].map(tag => (
                     <span key={tag} className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-300">
                       {tag}
                     </span>
@@ -274,9 +274,9 @@ export default function Contact() {
             {/* General Info Cards */}
             <div className="space-y-3">
               {[
-                { icon: <Mail className="w-4 h-4 text-blue-400" />, title: "Official Email Address", value: "santhivarshinidevan@gmail.com" },
-                { icon: <Phone className="w-4 h-4 text-cyan-400" />, title: "Contact Phone Line", value: "+91 6369083465" },
-                { icon: <MapPin className="w-4 h-4 text-indigo-400" />, title: "Development Location", value: "Dharmapuri, Tamil Nadu, India" }
+                { icon: <Mail className="w-4 h-4 text-red-400" />, title: "Official Email Address", value: "santhivarshinidevan@gmail.com" },
+                { icon: <Phone className="w-4 h-4 text-orange-400" />, title: "Contact Phone Line", value: "+91 6369083465" },
+                { icon: <MapPin className="w-4 h-4 text-amber-400" />, title: "Development Location", value: "Dharmapuri, Tamil Nadu, India" }
               ].map((info, idx) => (
                 <div 
                   key={idx} 
@@ -299,7 +299,7 @@ export default function Contact() {
               <div className="text-xs space-y-1">
                 <h4 className="text-emerald-400 font-bold">Hiring & Placement Opportunities</h4>
                 <p className="text-slate-400 leading-relaxed">
-                  Open for **Software Engineering Internships**, **Full-Stack Associate Developer**, and **Junior MLOps positions** worldwide (remote or relocation).
+                  Open for **Software Engineering Internships**, **Full-Stack Associate Developer**, and **Site Reliability/DevOps positions** worldwide (remote or relocation).
                 </p>
               </div>
             </div>

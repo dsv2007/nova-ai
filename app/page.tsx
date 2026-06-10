@@ -2,18 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import Background from "@/components/Background";
+import { motion } from "framer-motion";
 import { 
   Brain, 
   Cpu, 
   Database, 
-  LineChart, 
   ArrowRight, 
   Play, 
-  CheckCircle, 
   Sparkles, 
-  TrendingUp, 
-  Terminal, 
   Network
 } from "lucide-react";
 
@@ -30,7 +27,9 @@ export default function Home() {
   useEffect(() => {
     if (!isOptimizing) return;
     
-    setOptimizerStep(1); // Ingestion
+    const t0 = setTimeout(() => {
+      setOptimizerStep(1); // Ingestion
+    }, 0);
     
     const t1 = setTimeout(() => {
       setOptimizerStep(2); // Training
@@ -61,7 +60,10 @@ export default function Home() {
       };
     }, 1500);
 
-    return () => clearTimeout(t1);
+    return () => {
+      clearTimeout(t0);
+      clearTimeout(t1);
+    };
   }, [isOptimizing]);
 
   const handleStartOptimization = () => {
@@ -86,10 +88,10 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/5 text-blue-400 text-xs font-semibold tracking-wide mb-8 shadow-inner shadow-blue-500/10"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-red-500/30 bg-red-500/5 text-red-400 text-xs font-semibold tracking-wide mb-8 shadow-inner shadow-red-500/10"
         >
           <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-          <span>Next-Gen MLOps & Intelligence Platform</span>
+          <span>Next-Gen Data Integrity & System Corruption Alert Platform</span>
         </motion.div>
 
         {/* Headline */}
@@ -99,9 +101,9 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-4xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-8 max-w-4xl"
         >
-          Deploy Enterprise AI models <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400">
-            at Global Scale
+          Detect Data Corruption <br />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-orange-400 to-amber-500">
+            & Automate Mitigation
           </span>
         </motion.h1>
 
@@ -112,8 +114,8 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-slate-400 text-lg md:text-xl max-w-2xl leading-relaxed mb-12"
         >
-          NovaMind Cloud unifies your data pipelines, automates model training, and delivers sub-second inferences with out-of-the-box observability.
-        </motion.p>
+Nova AI
+Protect Filesystems, Databases, and APIs from Corruption        </motion.p>
 
         {/* CTA Buttons */}
         <motion.div 
@@ -144,7 +146,7 @@ export default function Home() {
               <span className="w-3 h-3 rounded-full bg-red-500/80" />
               <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
               <span className="w-3 h-3 rounded-full bg-green-500/80" />
-              <span className="text-slate-500 text-xs font-semibold font-mono ml-4">novamind-sandbox:~/ml-optimizer</span>
+              <span className="text-slate-500 text-xs font-semibold font-mono ml-4">Nova AI-sandbox:~/corruption-detector</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold tracking-wider uppercase font-mono">
@@ -159,27 +161,27 @@ export default function Home() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-white font-bold text-sm mb-1 flex items-center gap-1.5">
-                  <Brain className="w-4 h-4 text-blue-400" />
-                  Model Optimizer
+                  <Brain className="w-4 h-4 text-red-500" />
+                  Corruption Detector
                 </h3>
-                <p className="text-slate-500 text-xs">Run real-time gradient optimizations in the browser</p>
+                <p className="text-slate-500 text-xs">Scan checksums and detect data corruption in real-time</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Select Pipeline Dataset</label>
+                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Select Directory / Data Pool</label>
                   <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 text-xs outline-none">
-                    <option>S3 Revenue Logs (680MB)</option>
-                    <option>User Attrition Data (1.2GB)</option>
-                    <option>Real-Time Ingestion Logs (220MB)</option>
+                    <option>Filesystem Metadata Logs (680MB)</option>
+                    <option>Database Checksum Hashes (1.2GB)</option>
+                    <option>System Configuration Changes (220MB)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Optimizer Algorithm</label>
+                  <label className="block text-slate-400 text-xs font-medium mb-1.5">Detection Engine</label>
                   <select className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 text-xs outline-none">
-                    <option>HyperOpt XGBoost (Parallel)</option>
-                    <option>Adam SGD Deep MLP</option>
-                    <option>RandomForest Regressor</option>
+                    <option>SHA-256 Checksum Validator</option>
+                    <option>Heuristic File Anomaly Scanner</option>
+                    <option>Metadata Correlation Engine</option>
                   </select>
                 </div>
               </div>
@@ -194,7 +196,7 @@ export default function Home() {
                 }`}
               >
                 <Play className={`w-3.5 h-3.5 ${isOptimizing ? "animate-spin" : ""}`} />
-                {isOptimizing ? "Optimizing Hyperparameters..." : "Run Optimization"}
+                {isOptimizing ? "Scanning Sectors..." : "Execute Integrity Check"}
               </button>
             </div>
 
@@ -215,26 +217,26 @@ export default function Home() {
                   
                   {optimizerStep >= 1 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-between">
-                      <span className="text-slate-300">&gt; Loading datasets & scaling features...</span>
-                      <span className="text-blue-400 animate-pulse">INGESTING</span>
+                      <span className="text-slate-300">&gt; Loading filesystem logs & checksum tables...</span>
+                      <span className="text-orange-400 animate-pulse">LOADING</span>
                     </motion.div>
                   )}
                   {optimizerStep >= 2 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-between">
-                      <span className="text-slate-300">&gt; GridSearch CV: Epochs active, running SGD...</span>
-                      <span className="text-yellow-400 animate-bounce">TRAINING</span>
+                      <span className="text-slate-300">&gt; Performing hash checks against trust signatures...</span>
+                      <span className="text-yellow-400 animate-bounce">CHECKING</span>
                     </motion.div>
                   )}
                   {optimizerStep >= 3 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-between">
-                      <span className="text-slate-300">&gt; Hyperparameters configured. Exporting model weights...</span>
-                      <span className="text-cyan-400">PACKAGING</span>
+                      <span className="text-red-400 font-bold animate-pulse">&gt; Warning: Corrupted sector found at /var/lib/data-04...</span>
+                      <span className="text-red-500 font-bold">ALERT</span>
                     </motion.div>
                   )}
                   {optimizerStep === 4 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-between">
-                      <span className="text-emerald-400 font-bold">&gt; Deployment successful. Endpoint Live.</span>
-                      <span className="text-emerald-400 font-bold">SUCCESS</span>
+                      <span className="text-emerald-400 font-bold">&gt; Containment successful. Recovery agents armed.</span>
+                      <span className="text-emerald-400 font-bold">SECURED</span>
                     </motion.div>
                   )}
                 </div>
@@ -243,16 +245,16 @@ export default function Home() {
               {/* Live Metrics Grid */}
               <div className="grid grid-cols-3 gap-2 border-t border-slate-900 pt-4 mt-4 text-center">
                 <div className="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800/60">
-                  <div className="text-[10px] text-slate-500 mb-0.5">ACCURACY</div>
+                  <div className="text-[10px] text-slate-500 mb-0.5">INTEGRITY SCORE</div>
                   <div className="text-sm font-bold text-white font-mono">{metrics.accuracy}%</div>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800/60">
-                  <div className="text-[10px] text-slate-500 mb-0.5">LATENCY</div>
+                  <div className="text-[10px] text-slate-500 mb-0.5">SCAN LATENCY</div>
                   <div className="text-sm font-bold text-white font-mono">{metrics.latency}ms</div>
                 </div>
                 <div className="p-2.5 rounded-lg bg-slate-900/50 border border-slate-800/60">
-                  <div className="text-[10px] text-slate-500 mb-0.5">THROUGHPUT</div>
-                  <div className="text-sm font-bold text-white font-mono">{metrics.throughput}/s</div>
+                  <div className="text-[10px] text-slate-500 mb-0.5">SCAN SPEED</div>
+                  <div className="text-sm font-bold text-white font-mono">{metrics.throughput * 10} files/s</div>
                 </div>
               </div>
             </div>
@@ -262,10 +264,10 @@ export default function Home() {
         {/* Statistics section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 w-full max-w-5xl border-y border-slate-800/80 py-12 mb-28 text-center">
           {[
-            { value: "500+", label: "Enterprise Ingestion Pipelines", color: "text-blue-400" },
-            { value: "99.99%", label: "Uptime SLA Guarantee", color: "text-cyan-400" },
-            { value: "10x", label: "Faster Insights Retrieval", color: "text-indigo-400" },
-            { value: "12M+", label: "Real-time AI Inferences Daily", color: "text-purple-400" }
+            { value: "99.99%", label: "Data Integrity SLA", color: "text-red-400" },
+            { value: "12ms", label: "Mean Time to Detect (MTTD)", color: "text-orange-400" },
+            { value: "2,400+", label: "Active Directory Sensors", color: "text-amber-400" },
+            { value: "100+", label: "Automated Incident Triggers", color: "text-purple-400" }
           ].map((stat, idx) => (
             <div key={idx} className="space-y-2">
               <div className={`text-4xl font-extrabold font-mono ${stat.color}`}>{stat.value}</div>
@@ -278,29 +280,29 @@ export default function Home() {
       {/* Infrastructure Features Grid */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 pb-32">
         <div className="text-center mb-16">
-          <h2 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3">Enterprise Core Features</h2>
-          <h3 className="text-3xl md:text-5xl font-extrabold text-white">Built for Industrial Scale</h3>
+          <h2 className="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Enterprise Core Features</h2>
+          <h3 className="text-3xl md:text-5xl font-extrabold text-white">Built for System Scale</h3>
           <p className="text-slate-400 text-sm md:text-base max-w-lg mx-auto mt-4">
-            Everything your team needs to ingestion-run ML models with low latency and optimal scalability.
+            Everything your team needs to monitor directory integrity, analyze logs, and quarantine file corruption.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
-              icon: <Cpu className="w-6 h-6 text-blue-400" />,
-              title: "AutoML Ingestion & Pipelines",
-              desc: "Seamlessly connect datasets, auto-extract structural properties, apply scaling, and execute parallel parameter sweeps automatically."
+              icon: <Cpu className="w-6 h-6 text-red-400" />,
+              title: "Automated Checksum Scans",
+              desc: "Auto-scan directories, verify cryptographic hash logs, detect file changes, and isolate anomalous folder modifications."
             },
             {
-              icon: <Database className="w-6 h-6 text-cyan-400" />,
-              title: "Distributed Data Sources",
-              desc: "Deploy ETL integrations on AWS S3, BigQuery, Postgres, and Stripe. Synchronize, preprocess, and cache data pipelines on demand."
+              icon: <Database className="w-6 h-6 text-orange-400" />,
+              title: "Distributed SIEM Ingestion",
+              desc: "Aggregate system dumps and check-sum logs across server clusters, database pools, and multi-region cloud storage buckets."
             },
             {
-              icon: <Network className="w-6 h-6 text-indigo-400" />,
-              title: "Sub-Second Inference APIs",
-              desc: "Access robust deployed REST endpoints. Make queries, receive predictions, and view server performance metrics instantly."
+              icon: <Network className="w-6 h-6 text-amber-400" />,
+              title: "Automated Recovery Agents",
+              desc: "Deploy real-time containment webhooks. Trigger quarantines, block access paths, send PagerDuty alerts, and pull clean backups instantly."
             }
           ].map((feature, idx) => (
             <div 
@@ -318,6 +320,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+      <Background />
     </main>
   );
 }

@@ -11,31 +11,54 @@ export default function Pricing() {
 
   const plans = [
     {
-      name: "Starter",
+      name: "Starter Sandbox",
       price: billingPeriod === "monthly" ? "$0" : "$0",
       period: billingPeriod === "monthly" ? "forever free" : "forever free",
-      desc: "Perfect for students, individual researchers, and small teams testing ML ideas.",
-      features: ["Up to 3 active workspaces", "5GB secure data storage", "Basic AutoML runs", "Simulated inference metrics", "Community email support", "CSV data reports export"],
+      desc: "Perfect for developers, QA engineers, and hobbyists testing integrity checking tools or small filesystems.",
+      features: [
+        "Up to 3 active log streams",
+        "Basic integrity checks (MD5/SHA-1)",
+        "Manual webhook dispatches",
+        "Community Discord support",
+        "JSON incident reports export"
+      ],
       cta: "Launch Sandbox",
       highlight: false,
       color: "border-slate-800 hover:border-slate-700 bg-slate-900/30"
     },
     {
-      name: "Pro Developer",
+      name: "Sentinel Professional",
       price: billingPeriod === "monthly" ? "$49" : "$39",
       period: billingPeriod === "monthly" ? "per month" : "per month, billed annually",
-      desc: "For engineers and scaling startups that need dedicated pipeline power.",
-      features: ["Unlimited workspaces", "100GB secure data storage", "Automated hyperparameter sweeps", "Full pipeline node builder", "24/7 priority support", "REST API endpoint deployment", "Custom PDF reports", "Slack integration hooks"],
+      desc: "For active DevOps teams and system administrators requiring continuous corruption scanning.",
+      features: [
+        "Unlimited syslog integrations",
+        "Continuous SHA-256 integrity loops",
+        "Real-time Slack & Discord alerts",
+        "24/7 priority support SLA",
+        "Automatic quarantine hooks",
+        "Custom incident forensics PDF",
+        "API access for alert automation"
+      ],
       cta: "Start Pro Trial",
       highlight: true,
-      color: "border-blue-500/50 hover:border-blue-500 bg-gradient-to-b from-blue-500/10 to-transparent shadow-xl shadow-blue-500/5"
+      color: "border-red-500/50 hover:border-red-500 bg-gradient-to-b from-red-500/10 to-transparent shadow-xl shadow-red-500/5"
     },
     {
-      name: "Enterprise MLOps",
+      name: "Enterprise Compliance",
       price: "Custom",
       period: "tailored billing agreements",
-      desc: "For organizations requiring custom deployment pipelines, compliance, and support.",
-      features: ["Dedicated private GPU pools", "Unlimited data storage", "Custom proprietary models support", "Dedicated Technical Account Manager", "99.99% Latency SLA contract", "SSO/SAML client logins", "SOC2 compliance audit logs", "On-premise docker deployments"],
+      desc: "For large organizations requiring custom retention, high-throughput scanning, and strict SLAs.",
+      features: [
+        "Dedicated Sentinel indexing clusters",
+        "Unlimited syslog history retention",
+        "Custom heuristic anomaly models",
+        "Dedicated account manager",
+        "99.999% scan uptime SLA",
+        "SSO/SAML & granular RBAC",
+        "SOC2 & ISO27001 audit compliance logs",
+        "On-premise docker deployments"
+      ],
       cta: "Contact Sales",
       highlight: false,
       color: "border-slate-800 hover:border-slate-700 bg-slate-900/30"
@@ -44,20 +67,20 @@ export default function Pricing() {
 
   const faqs = [
     {
-      q: "Can I upgrade or downgrade my subscription at any time?",
-      a: "Absolutely! You can upgrade your plan to unlock more CPU/GPU compute power or downgrade at any time. Changes to billing are pro-rated and applied immediately."
+      q: "Can I upgrade or downgrade my monitoring plan?",
+      a: "Yes, you can scale your plan based on data throughput. Plan modifications are pro-rated and applied immediately to your active billing cycle."
     },
     {
-      q: "What is the computational limit on the Starter plan?",
-      a: "The Starter plan allows for basic, lightweight AutoML runs utilizing standard sandboxed CPU slots. If you require persistent models or heavy GPU workloads, we recommend upgrading to Pro."
+      q: "What is the scan limit on the Starter plan?",
+      a: "The Starter plan allows for basic integrity checks on demand. For continuous real-time daemon-based syslog ingestion and quarantine orchestration, we recommend upgrading to Sentinel Professional."
     },
     {
-      q: "Are there any hidden API call charges?",
-      a: "No hidden charges whatsoever. Pro plan pricing covers standard developer scale. If your REST endpoints exceed 1M API inferences per month, standard low-cost egress rates apply."
+      q: "Are there any hidden ingestion or alert dispatch fees?",
+      a: "No hidden charges whatsoever. The Professional plan covers standard team operations. If your webhook notifications exceed 100k triggers per month, standard low-cost egress rates apply."
     },
     {
-      q: "Do you offer developer discounts for startups?",
-      a: "Yes! Startups and open-source contributors can receive up to 50% discount on the Pro Developer plan for their first 12 months. Contact our startup support desk."
+      q: "Do you offer discounts for open-source projects or startups?",
+      a: "Yes! Startups and open-source infrastructure tools can receive up to 50% discount on the Sentinel Professional plan for their first 12 months. Contact our helpdesk to apply."
     }
   ];
 
@@ -69,23 +92,23 @@ export default function Pricing() {
     <main className="min-h-screen bg-slate-950 bg-grid-dots pt-24 pb-20 relative overflow-hidden">
       
       {/* Background glow orbs */}
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-red-600/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-400 text-xs font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/5 text-red-400 text-xs font-semibold mb-6">
             <span>Flexible Subscriptions</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6 leading-tight">
             Simple, Scale-Ready
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400 block md:inline md:ml-3">
-              Developer Pricing
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-orange-400 to-amber-500 block md:inline md:ml-3">
+              Integrity Plans
             </span>
           </h1>
           <p className="text-slate-400 text-base md:text-lg leading-relaxed mb-8">
-            Deploy models instantly. Choose a plan tailored to your data throughput. Cancel or adjust anytime.
+            Deploy monitors instantly. Choose a plan tailored to your data throughput. Cancel or adjust anytime.
           </p>
 
           {/* Billing Toggle */}
@@ -94,7 +117,7 @@ export default function Pricing() {
               onClick={() => setBillingPeriod("monthly")}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                 billingPeriod === "monthly" 
-                  ? "bg-blue-600 text-white shadow" 
+                  ? "bg-red-600 text-white shadow" 
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
@@ -104,7 +127,7 @@ export default function Pricing() {
               onClick={() => setBillingPeriod("annual")}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 billingPeriod === "annual" 
-                  ? "bg-blue-600 text-white shadow" 
+                  ? "bg-red-600 text-white shadow" 
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
@@ -128,8 +151,8 @@ export default function Pricing() {
               className={`p-8 rounded-2xl border flex flex-col justify-between relative transition-all duration-300 ${plan.color}`}
             >
               {plan.highlight && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow shadow-blue-500/20">
-                  Developer Recommended
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow shadow-red-500/20">
+                  Recommended Plan
                 </div>
               )}
               
@@ -173,11 +196,11 @@ export default function Pricing() {
         {/* FAQ Section */}
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5 text-blue-400 text-xs font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/5 text-red-400 text-xs font-semibold mb-4">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Common Questions</span>
             </div>
-            <h2 className="text-3xl font-extrabold text-white">Billing & Compute FAQ</h2>
+            <h2 className="text-3xl font-extrabold text-white">Integrations & Ingestion FAQ</h2>
           </div>
 
           <div className="space-y-4">

@@ -4,9 +4,10 @@ import Navbar from "@/components/Navbar";
 import Background from "@/components/Background";
 
 export const metadata: Metadata = {
-  title: "NovaMind Cloud — AI-Powered Business Intelligence",
-  description: "Transform your data into actionable insights with AI-powered analytics",
+  title: "Nova AI",
+  description: "Enterprise Data Integrity & System Corruption Monitoring Platform",
 };
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
