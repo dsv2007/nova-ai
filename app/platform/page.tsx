@@ -1858,7 +1858,7 @@ export default function Platform() {
                     <h3 className="text-white font-bold text-sm">HTTP Request Poster</h3>
                     <div className="flex items-center gap-2 font-mono text-[10px] text-slate-500 bg-slate-950 px-3 py-1 rounded border border-slate-900">
                       <span className="text-red-400 font-bold">POST</span>
-                      <span>novaalert.api/v1/{apiTesterEndpoint}</span>
+                      <span>nova-ai.api/v1/{apiTesterEndpoint}</span>
                     </div>
                   </div>
 

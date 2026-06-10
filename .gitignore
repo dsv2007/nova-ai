@@ -48,3 +48,5 @@ backend/baseline.json
 __pycache__/
 backend/__pycache__/
 sandbox_files/
+
+.vercel

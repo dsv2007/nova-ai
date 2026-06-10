@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 ## 📸 Live Demo
-🔗 **[View Live Website](https://novaalert-cloud.vercel.app)** *(Deploy when ready)*
+🔗 **[View Live Website](https://novamind-cloud.vercel.app)**
 
 ## ✨ Features
 
